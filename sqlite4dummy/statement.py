@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+class, method, func, exception
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""
+
 _CREATE_TABLE_TEMPLATE = \
 """
 %s
@@ -8,29 +13,26 @@ _CREATE_TABLE_TEMPLATE = \
 %s%s
 )
 """
-class Statement():
-    pass
-
 
 class CreateTable():
+    """Generate 'CREATE TABLE' SQL statement.
+    
+    Example::
+    
+        CREATE TABLE table_name
+        (
+            column_name1 dtype1 CONSTRAINS,
+            column_name2 dtype2 CONSTRAINS,
+            PRIMARY KEY (column, ...),
+            FOREIGN KEY (table_column, ...)
+        )
+        
+    **中文文档**
+    
+    用于根据Table的Schema创建CREATE TABLE的SQL语句。
+    """
     temp = _CREATE_TABLE_TEMPLATE
     def __init__(self, table):
-        """Generate 'CREATE TABLE' SQL statement.
-        
-        Example::
-        
-            CREATE TABLE table_name
-            (
-                column_name1 dtype1 CONSTRAINS,
-                column_name2 dtype2 CONSTRAINS,
-                PRIMARY KEY (column, ...),
-                FOREIGN KEY (table_column, ...)
-            )
-            
-        **中文文档**
-        
-        用于根据Table的Schema创建CREATE TABLE的SQL语句。
-        """
         clause_CREATE_TABLE = "CREATE TABLE %s" % table.table_name
         clause_DATATYPE = "\t" + ",\n\t".join(
             [self._column_param(column) for column in table]
@@ -94,7 +96,7 @@ if __name__ == "__main__":
                 )
             
             create_table = CreateTable(employee)
-            
+            print(create_table.sql)
             connect = sqlite3.connect(":memory:", 
                                       detect_types=sqlite3.PARSE_DECLTYPES)
             cursor = connect.cursor()

@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+This module provides some high performance iterator function support.
+
+class, method, func, exception
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""
+
 import itertools
 import sys
 

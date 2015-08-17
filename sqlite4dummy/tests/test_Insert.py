@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+本测试模块用于测试与Insert有关的功能
+
+
+class, method, func, exception
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""
 from sqlite4dummy import *
 from datetime import datetime, date
 from pprint import pprint as ppt
@@ -69,7 +76,10 @@ class InsertUnittest(unittest.TestCase):
             "tag": ["Crime", "Mystery", "Thriller"],
         },
         ]
-        self.rows = [Row.from_dict(doc) for doc in data]
+        self.rows = list()
+        for doc in data:
+             row = Row(columns, tuple([doc[name] for name in columns]))
+             self.rows.append(row)
         self.records = [tuple([doc[name] for name in columns]) for doc in data]
 
     def test_insert_sql(self):
@@ -78,9 +88,12 @@ class InsertUnittest(unittest.TestCase):
         ins = self.movie.insert()
         ins.sql_from_record()
         self.assertEqual(ins.sql, 
-            "INSERT INTO movie\nVALUES\n\t(?, ?, ?, ?, ?, ?, ?, ?);")
+            "INSERT INTO\tmovie\nVALUES\n\t(?, ?, ?, ?, ?, ?, ?, ?);")
         ins.sql_from_row(self.rows[0])
-#             print(ins.sql)
+        self.assertEqual(ins.sql, 
+            "INSERT INTO\tmovie\n\t(_id, title, year, release_date, "
+            "create_time, length, rate, tag)"
+            "\nVALUES\n\t(?, ?, ?, ?, ?, ?, ?, ?);")
 
     def test_insert_record(self):
         """
@@ -148,6 +161,16 @@ class InsertUnittest(unittest.TestCase):
         
 class InsertPerformanceUnittest(unittest.TestCase):
     """
+
+    **中文文档**
+    
+    测试分别在批量插入时, 有/无主键冲突的情况下, 有/无 pickletype的情况下, 
+    sqlite4dummy的性能是否高于sqlalchemy。
+    
+    1. not conflict + has pickle type, sqlalchemy胜出, 用时是另一个的2/3
+    2. not conflict + no pickle type, 两者不相上下
+    3. conflict + has pickle type, sqlite4dummy胜出, 用时是另一个的2/3
+    4. conflict + no pickle type, sqlite4dummy胜出, 用时是另一个的1/35
     
     结论: 对于有primary_key重复的情况下, 使用bulk insert一定要使用原生API,
     而不要使用sqlalchemy.
@@ -178,7 +201,7 @@ class InsertPerformanceUnittest(unittest.TestCase):
         self.sa_metadata.create_all(self.sa_engine)
         
     def test_sqlite4dummy_vs_sqlalchemy_in_bulk_insert_has_pk_non_repeat(self):
-        print("\n对于数据不重复, 有PickleType的情况")
+        print("\nNo conflict and has PickleType")
         complexity = 1000
           
         records = [(i, [1,2,3]) for i in range(complexity)]
@@ -197,7 +220,7 @@ class InsertPerformanceUnittest(unittest.TestCase):
         print(len(list(self.sa_engine.execute("SELECT * FROM has_pk"))))
         
     def test_sqlite4dummy_vs_sqlalchemy_in_bulk_insert_no_pk_non_repeat(self):
-        print("\n对于数据不重复, 不含PickleType的情况")
+        print("\nNo conflict and non PickleType")
         complexity = 1000
           
         records = [(i, "hello world") for i in range(complexity)]
@@ -216,7 +239,7 @@ class InsertPerformanceUnittest(unittest.TestCase):
         print(len(list(self.sa_engine.execute("SELECT * FROM no_pk"))))
         
     def test_sqlite4dummy_vs_sqlalchemy_in_bulk_insert_has_pk_repeative(self):
-        print("\n对于数据有重复, 有PickleType的情况")
+        print("\nPrimary key conflict and has PickleType")
         complexity = 1000
         
         records = [(random.randint(1, complexity), 
@@ -241,7 +264,7 @@ class InsertPerformanceUnittest(unittest.TestCase):
         print(len(list(self.sa_engine.execute("SELECT * FROM has_pk"))))
 
     def test_sqlite4dummy_vs_sqlalchemy_in_bulk_insert_no_pk_repeative(self):
-        print("\n对于数据有重复, 不含PickleType的情况")
+        print("\nPrimary key conflict and non PickleType")
         complexity = 1000
          
         records = [(random.randint(1, complexity), 
@@ -264,5 +287,6 @@ class InsertPerformanceUnittest(unittest.TestCase):
                 pass
         print("sqlalchemy elapse %.6f seconds." % (time.clock() - st))
         print(len(list(self.sa_engine.execute("SELECT * FROM no_pk"))))
-        
-unittest.main()
+
+if __name__ == "__main__":
+    unittest.main()

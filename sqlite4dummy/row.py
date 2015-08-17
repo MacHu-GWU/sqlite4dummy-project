@@ -1,6 +1,176 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+English Doc
+~~~~~~~~~~~
+
+Row模块用于包装游标(Cursor)返回的数据。默认条件下游标返回的是元组(tuple)。而对 
+元组中的值进行访问只能通过位置索引, 并不是很方便, 也不方便对其编程。Row提供了     
+通过列名对值进行访问的方法, 一共有两种形式:
+
+1. ``Row.column_name``
+2. ``Row[column_name]``
+
+Create a Row object, column order are preserved:
+
+.. code-block:: python
+
+    >>> row = Row(columns=["c1", "c2"], values=[1, 2])
+    >>> print(row)
+    (1, 2)
+    >>> row
+    Row(columns=['c1', 'c2'], values=[1, 2])
+
+Create a Row object from a dictionary, if it is an OrderedDict, then column 
+order are preserved. Otherwise, the order is random. But it doens't matter for
+executing Insert, Update:
+
+.. code-block:: python
+
+    >>> from collections import OrderedDict
+    >>> d = OrderedDict([("c1", 1), ("c2", 2)])
+    >>> row = Row.from_dict(d)
+    >>> row
+    Row(columns=['c1', 'c2'], values=[1, 2])
+    
+Visit value:
+
+.. code-block:: python
+
+    >>> row.values
+    (1, 2)
+    >>> row.c1
+    1
+    >>> row["c2"]
+    2
+    
+Get dictionary view of a Row object::
+
+    >>> row.data
+    OrderedDict([('c1', 1), ('c2', 2)])
+    
+Edit Row:
+
+.. code-block:: python
+    
+    # correct way
+    >>> row["c2"] = 20
+    >>> row
+    Row(columns=['c1', 'c2'], values=[1, 20])
+    
+    # wrong way
+    >>> row.c2 = 1000
+    >>> row
+    Row(columns=['c1', 'c2'], values=[1, 20])
+
+Create a copy of Row data. Avoid changing the Row object it self. use
+:meth:`Row.to_dict`:
+
+.. code-block:: python
+
+    # 这样做对data进行的任何修改不会影响到原来的Row对象
+    >>> data = row.to_dict()
+    >>> data
+    OrderedDict([('c1', 1), ('c2', 2)])
+    
+Sure it also support ``in`` and ``==`` keyword:
+
+.. code-block:: python
+
+    >>> "c1" in row
+    True
+    
+    >>> row == Row(columns=["c1", "c2"], values=[1, 2])
+    True
+    
+Chinese Doc (中文文档)
+~~~~~~~~~~~~~~~~~~~~~~
+
+Row模块用于包装游标(Cursor)返回的数据。默认条件下游标返回的是元组(tuple)。而对 
+元组中的值进行访问只能通过位置索引, 并不是很方便, 也不方便对其编程。Row提供了     
+通过列名对值进行访问的方法, 一共有两种形式:
+
+1. ``Row.column_name``
+2. ``Row[column_name]``
+
+创建一个Row对象:
+
+.. code-block:: python
+
+    # 通过columns, values初始化, 能够保存下顺序信息
+    >>> row = Row(columns=["c1", "c2"], values=[1, 2])
+    >>> print(row)
+    (1, 2)
+    >>> row
+    Row(columns=['c1', 'c2'], values=[1, 2])
+
+从字典创建一个Row对象:
+
+.. code-block:: python
+
+    # 通过有序字典初始化Row对象, 则能保存下顺序信息。如果使用原生Python dict
+    # 则无法保证顺序。但是在用于使用Row执行Insert, Update的时候并不影响。
+    >>> from collections import OrderedDict
+    >>> d = OrderedDict([("c1", 1), ("c2", 2)])
+    >>> row = Row.from_dict(d)
+    >>> row
+    Row(columns=['c1', 'c2'], values=[1, 2])
+    
+对Row的值进行访问:
+
+.. code-block:: python
+
+    >>> row.values
+    (1, 2)
+    >>> row.c1
+    1
+    >>> row["c2"]
+    2
+    
+取得Row的字典视图, 注意, 此方法用于只读::
+
+    >>> row.data
+    OrderedDict([('c1', 1), ('c2', 2)])
+    
+对Row的值进行修改:
+
+.. code-block:: python
+    
+    # 使用索引修改Row的值
+    >>> row["c2"] = 20
+    >>> row
+    Row(columns=['c1', 'c2'], values=[1, 20])
+    
+    # 注意! 这是错误的方法。这样相当于给Row新增了一个属性Row.c2, 而不是对
+    # Row["c2"]的值进行了修改。这样以后就无法使用Row.c2正确滴访问Row["c2"]的值了
+    >>> row.c2 = 1000
+    >>> row
+    Row(columns=['c1', 'c2'], values=[1, 20])
+    
+如果要在其他地方使用到Row中的数据, 而且会涉及修改操作, 则使用
+:meth:`Row.to_dict` 方法:
+
+.. code-block:: python
+
+    # 这样做对data进行的任何修改不会影响到原来的Row对象
+    >>> data = row.to_dict()
+    >>> data
+    OrderedDict([('c1', 1), ('c2', 2)])
+    
+当然我们还提供了``in``, ``==``关键字的支持:
+
+.. code-block:: python
+
+    >>> "c1" in row
+    True
+    >>> row == Row(columns=["c1", "c2"], values=[1, 2])
+    True
+    
+class, method, func, exception
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""
+
 from collections import OrderedDict
 import copy
 
@@ -21,6 +191,7 @@ class Row():
     数据表中的行数据类。 可以使用索引Row[column_name]或是属性Row.column_name的
     方式对值进行访问。
     """
+    
     def __init__(self, columns, values):
         """Row object are constructed by columns tuple and values tuple.
         """
@@ -48,7 +219,7 @@ class Row():
         return Row(tuple(dictionary.keys()), tuple(dictionary.values()))
 
     def __str__(self):
-        return str(self.values)
+        return str(tuple(self.values))
     
     def __repr__(self):
         return "Row(columns=%s, values=%s)" % (self.columns, self.values)
@@ -73,7 +244,7 @@ class Row():
         **中文文档**
         
         返回Row的字典视图, 对其修改等于是修改Row对象本身。所以尽量不要直接对
-        Row.data进行操作, 而是通过:meth:`Row[column_name]<Row.__getitem__>`
+        Row.data进行重新赋值操作。
         """
         if not self.dict_view:
             self._create_dict_view()
@@ -137,6 +308,10 @@ class Row():
             
     def items(self):
         """Return a list of tuples, each tuple containing a key/value pair.
+        
+        **中文文档**
+        
+        对key, value进行访问的循环器。
         """
         for column_name, value in zip(self.columns, self.values):
             yield column_name, value

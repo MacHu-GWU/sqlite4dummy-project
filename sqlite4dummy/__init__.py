@@ -4,7 +4,7 @@
 from .dtype import dtype
 from .engine import Sqlite3Engine
 from .row import Row
-from .schema import (Column, Table, MetaData,
-    Insert, Select)
+from .schema import (Column, Table, Index, MetaData,
+    Insert, Select, Update, Delete)
 from .func import func
 from .sql import and_, or_, asc, desc

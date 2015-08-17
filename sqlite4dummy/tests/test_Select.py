@@ -1,13 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+本测试模块用于测试与Select有关的功能
+
+
+class, method, func, exception
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""
+from __future__ import print_function, unicode_literals
 from sqlite4dummy import *
 from datetime import datetime, date
-from pprint import pprint as ppt
 import sqlalchemy
 import unittest
 import time
-import random
 
 class SelectUnittest(unittest.TestCase):
     def setUp(self):
@@ -76,58 +82,58 @@ class SelectUnittest(unittest.TestCase):
         self.engine.commit()
 
     # SELECT SQL syntax
-#     def test_select_sql(self):
-#         s = Select(self.movie.all)
-#         print("{:=^100}".format("select all formatted sql:"))
-#         print(s.sql)
-#           
-#     def test_select_where(self):
-#         movie = self.movie
-#         s = Select(movie.all).where(
-#                 movie.c.year >= 2005, movie.c.rate >= 6.2)
-#         print("{:=^100}".format("select where formatted sql:"))
-#         print(s.sql)
-#     
-#     def test_select_order_by(self):
-#         movie = self.movie
-#         s = Select(self.movie.all).order_by(
-#             desc(movie.c.rate), movie.c.title)
-#         print("{:=^100}".format("select order by formatted sql:"))
-#         print(s.sql)
-#     
-#     def test_select_limit(self):
-#         movie = self.movie
-#         s = Select(movie.all).limit(10)
-#         print("{:=^100}".format("select limit formatted sql:"))
-#         print(s.sql)
-#     
-#     def test_select_offset(self):
-#         movie = self.movie
-#         s = Select(movie.all).offset(5)
-#         print("{:=^100}".format("select offset formatted sql:"))
-#         print(s.sql)
-#     
-#     def test_select_distinct(self):
-#         movie = self.movie
-#         s = Select([movie.c._id, movie.c.title]).distinct()
-#         print("{:=^100}".format("select distinct formatted sql:"))
-#         print(s.sql)
-#     
-#     def test_select_count(self):
-#         movie = self.movie
-#         r = func.count(movie.c._id)
-#         s = Select([func.count(movie.c._id)])
-#         print("{:=^100}".format("select count formatted sql:"))
-#         print(s.sql)
-# 
-#     def test_select_from(self):
-#         movie = self.movie
-#         r = func.count(movie.c._id)
-#         s = Select([func.count(movie.c._id)]).\
-#             select_from(Select(movie.all).\
-#                         where(movie.c.rate >= 6.0))
-#         print("{:=^100}".format("select from formatted sql:"))
-#         print(s.sql)
+    def test_select_sql(self):
+        s = Select(self.movie.all)
+        print("{:=^100}".format("select all formatted sql:"))
+        print(s.sql)
+           
+    def test_select_where(self):
+        movie = self.movie
+        s = Select(movie.all).where(
+                movie.c.year >= 2005, movie.c.rate >= 6.2)
+        print("{:=^100}".format("select where formatted sql"))
+        print(s.sql)
+     
+    def test_select_order_by(self):
+        movie = self.movie
+        s = Select(self.movie.all).order_by(
+            desc(movie.c.rate), movie.c.title)
+        print("{:=^100}".format("select order by formatted sql"))
+        print(s.sql)
+     
+    def test_select_limit(self):
+        movie = self.movie
+        s = Select(movie.all).limit(10)
+        print("{:=^100}".format("select limit formatted sql"))
+        print(s.sql)
+     
+    def test_select_offset(self):
+        movie = self.movie
+        s = Select(movie.all).offset(5)
+        print("{:=^100}".format("select offset formatted sql"))
+        print(s.sql)
+     
+    def test_select_distinct(self):
+        movie = self.movie
+        s = Select([movie.c._id, movie.c.title]).distinct()
+        print("{:=^100}".format("select distinct formatted sql"))
+        print(s.sql)
+     
+    def test_select_count(self):
+        movie = self.movie
+        r = func.count(movie.c._id)
+        s = Select([func.count(movie.c._id)])
+        print("{:=^100}".format("select count formatted sql"))
+        print(s.sql)
+ 
+    def test_select_from(self):
+        movie = self.movie
+        r = func.count(movie.c._id)
+        s = Select([func.count(movie.c._id)]).\
+            select_from(Select(movie.all).\
+                        where(movie.c.rate >= 6.0))
+        print("{:=^100}".format("select from formatted sql"))
+        print(s.sql)
         
     # query with engine
     def test_select_record_in_engine(self):
@@ -203,7 +209,7 @@ class SelectUnittest(unittest.TestCase):
         """
         movie = self.movie
         results = list(self.engine.select_row(Select([func.count(movie.c._id)])))
-        self.assertDictEqual(results[0].to_dict(), {"_count": 4})
+        self.assertDictEqual(results[0].to_dict(), {"_count_": 4})
     
     # return dict like DataFrame
     def test_select_dict_in_engine(self):
@@ -214,6 +220,130 @@ class SelectUnittest(unittest.TestCase):
     def test_select_dict_with_count_in_engine(self):
         movie = self.movie
         results = self.engine.select_dict(Select([func.count(movie.c._id)]))
-        self.assertEqual(results["_count"][0], 4)
+        self.assertEqual(results["_count_"][0], 4)
+
+class SelectPerformanceUnittest(unittest.TestCase):
+    """
+    
+    **中文文档**
+    
+    测试分别在返回record, row以及结果中 有/无 pickletype的情况下, sqlite4dummy
+    的性能是否高于sqlalchemy。
+    
+    1. record + has pickle type, 两者不相上下
+    2. record + no pickle type, sqlite4dummy明显胜出, 用时是另一个的1/2
+    3. row + has pickle type, sqlalchemy胜出, 用时是另一个的2/3
+    4. row + no pickle type, sqlite4dummy胜出, 用时是另一个的2/3
+    """
+    def setUp(self):
+        self.metadata = MetaData()
+        self.has_pk = Table("has_pk", self.metadata,
+            Column("_id", dtype.INTEGER, primary_key=True),
+            Column("_list", dtype.PICKLETYPE),
+            )
+        self.no_pk = Table("no_pk", self.metadata,
+            Column("_id", dtype.INTEGER, primary_key=True),
+            Column("_text", dtype.TEXT),
+            )
+        self.engine = Sqlite3Engine(":memory:")
+        self.metadata.create_all(self.engine)
         
-unittest.main()
+        self.sa_metadata = sqlalchemy.MetaData()
+        self.sa_has_pk = sqlalchemy.Table("has_pk", self.sa_metadata,
+            sqlalchemy.Column("_id", sqlalchemy.Integer, primary_key=True),
+            sqlalchemy.Column("_list", sqlalchemy.PickleType),
+            )
+        self.sa_no_pk = sqlalchemy.Table("no_pk", self.sa_metadata,
+            sqlalchemy.Column("_id", sqlalchemy.Integer, primary_key=True),
+            sqlalchemy.Column("_text", sqlalchemy.TEXT),
+            )
+        self.sa_engine = sqlalchemy.create_engine("sqlite://", echo=False)
+        self.sa_metadata.create_all(self.sa_engine)
+        
+        data_has_pk = [{"_id": i, "_list": [1, 2, 3]} for i in range(1000)]
+        data_no_pk = [{"_id": i, "_text": "Hello World"} for i in range(1000)]
+        
+        ins = self.has_pk.insert()
+        self.engine.insert_many_row(ins, 
+                                    [Row.from_dict(i) for i in data_has_pk])
+        
+        ins = self.no_pk.insert()
+        self.engine.insert_many_row(ins, 
+                                    [Row.from_dict(i) for i in data_no_pk])
+        
+        ins = self.sa_has_pk.insert()
+        self.sa_engine.execute(ins, data_has_pk)
+        
+        ins = self.sa_no_pk.insert()
+        self.sa_engine.execute(ins, data_no_pk)
+        
+    def test_select_record_has_pk(self):
+        print("\nSelect record HAS pickle type")
+        st = time.clock()
+        for record in self.engine.select(Select(self.has_pk.all)):
+            pass
+        print("sqlite4dummy elapse %.6f seconds." % (time.clock() - st))
+        print("%s item returns." % 
+              len(list(self.engine.execute("SELECT * FROM has_pk"))))
+        
+        st = time.clock()
+        for record in self.sa_engine.execute(sqlalchemy.sql.select([
+                                                            self.sa_has_pk])):
+            pass
+        print("sqlalchemy elapse %.6f seconds." % (time.clock() - st))
+        print("%s item returns." %
+              len(list(self.engine.execute("SELECT * FROM has_pk"))))
+        
+    def test_select_record_no_pk(self):
+        print("\nSelect record NO pickle type")
+        st = time.clock()
+        for record in self.engine.select(Select(self.no_pk.all)):
+            pass
+        print("sqlite4dummy elapse %.6f seconds." % (time.clock() - st))
+        print("%s item returns." % 
+              len(list(self.engine.execute("SELECT * FROM no_pk"))))
+         
+        st = time.clock()
+        for record in self.sa_engine.execute(sqlalchemy.sql.select([
+                                                            self.sa_no_pk])):
+            pass
+        print("sqlalchemy elapse %.6f seconds." % (time.clock() - st))
+        print("%s item returns." %
+              len(list(self.engine.execute("SELECT * FROM no_pk"))))
+ 
+    def test_select_row_has_pk(self):
+        print("\nSelect row HAS pickle type")
+        st = time.clock()
+        for row in self.engine.select_row(Select(self.has_pk.all)):
+            pass
+        print("sqlite4dummy elapse %.6f seconds." % (time.clock() - st))
+        print("%s item returns." % 
+              len(list(self.engine.execute("SELECT * FROM has_pk"))))
+         
+        st = time.clock()
+        for row in self.sa_engine.execute(sqlalchemy.sql.select([
+                                                            self.sa_has_pk])):
+            pass
+        print("sqlalchemy elapse %.6f seconds." % (time.clock() - st))
+        print("%s item returns." %
+              len(list(self.engine.execute("SELECT * FROM has_pk"))))
+ 
+    def test_select_row_no_pk(self):
+        print("\nSelect row NO pickle type")
+        st = time.clock()
+        for row in self.engine.select_row(Select(self.no_pk.all)):
+            pass
+        print("sqlite4dummy elapse %.6f seconds." % (time.clock() - st))
+        print("%s item returns." % 
+              len(list(self.engine.execute("SELECT * FROM no_pk"))))
+         
+        st = time.clock()
+        for row in self.sa_engine.execute(sqlalchemy.sql.select([
+                                                            self.sa_no_pk])):
+            pass
+        print("sqlalchemy elapse %.6f seconds." % (time.clock() - st))
+        print("%s item returns." %
+              len(list(self.engine.execute("SELECT * FROM no_pk"))))
+        
+if __name__ == "__main__":
+    unittest.main()

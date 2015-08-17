@@ -2,7 +2,17 @@
 # -*- coding: utf-8 -*-
 
 """
-数据类型
+Chinese Doc (中文文档)
+~~~~~~~~~~~~~~~~~~~~~~
+
+sqlite3中所支持的, 以及我们常用到的数据类型有:
+
+- INTEGER: 整数 (sqlite3不支持布尔值, 用整数的0和1代替)
+- REAL: 小数
+- STRING:
+
+class, method, func, exception
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
 from datetime import datetime, date
@@ -17,8 +27,12 @@ else:
     pk_protocol = 3
     
 def bytestr2hexstring(bytestr):
-    """convert byte string to hex string, for example
-    b'\x80\x03]q\x00(K\x01K\x02K\x03e.'  to  X'80035d7100284b014b024b03652e'
+    """convert byte string to hex string.
+    
+    Example::
+    
+        >>> bytestr2hexstring(b'\x80\x03]q\x00(K\x01K\x02K\x03e.')
+        X'80035d7100284b014b024b03652e'
     """
     res = list()
     for i in bytestr:
@@ -26,7 +40,8 @@ def bytestr2hexstring(bytestr):
     return "".join(res)
 
 class BaseDataType():
-    """
+    """DataType Base Class.
+    
     **中文文档 **
     
     所有数据类型的父类。
@@ -55,6 +70,7 @@ class BaseDataType():
     
     def from_sql_param(self, text):
         """
+        
         **中文文档**
         
         根据sql中的字符串, 根据数据类型, 解析出原始值。
@@ -74,6 +90,9 @@ class TEXT(BaseDataType):
     """UTF-8 string type.
     """
     sqlite_name = "TEXT"
+
+    def to_sql_param(self, value):
+        return "'%s'" % value.replace("'", "''").replace('"', '\"')
     
 class INTEGER(BaseDataType):
     """Integer type.
@@ -133,8 +152,9 @@ class PICKLETYPE(BaseDataType):
     Use pickle.dumps(), pickle.loads() as database IO interface.
 
     **中文文档**
-    
-    任何可被pickle序列化的Python对象
+
+    任何可被pickle序列化的Python对象。
+
     """
     sqlite_name = "BLOB"
 
@@ -150,6 +170,15 @@ class PICKLETYPE(BaseDataType):
             return pickle.loads(binascii.unhexlify(text[2:-1]))
     
 class DataType():
+    """A DataType container class. 
+    
+    So dtype instance can be visit by::
+    
+        >>> dtype.TEXT
+        TEXT
+        >>> dtype.DATETIME
+        DATETIME
+    """
     def __init__(self):
         self.TEXT = TEXT()
         self.INTEGER = INTEGER()
@@ -179,7 +208,6 @@ if __name__ == "__main__":
     import sqlite3
     
     class DataTypeUnittest(unittest.TestCase):
-    
         def test_name_space(self):
             self.assertEqual(dtype.TEXT.name, "TEXT")
             self.assertEqual(dtype.INTEGER.name, "INTEGER")
