@@ -3,7 +3,7 @@
 *.db
 _source
 build
-source/sqlite4dummy
+# source/sqlite4dummy
 tests
 
 # Windows image file caches
