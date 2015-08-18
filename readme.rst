@@ -1,6 +1,10 @@
 sqlite4dummy, a high performance and easy to use Sqlite API for Data Scientist
 ===================================================================================================
 
+Some quick link:
+
+`Documentation <http://sqlite4dummy-project.readthedocs.org/>`_
+`PyPI download <https://pypi.python.org/pypi/sqlite4dummy>`_
 
 Since Sqlalchemy is the best, why another Sqlite API?
 ---------------------------------------------------------------------------------------------------
