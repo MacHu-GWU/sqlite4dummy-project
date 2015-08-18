@@ -1,12 +1,12 @@
 # MacHu Setting
 *.pyc
 *.db
-_source
+#_source
 build
 dist
 sqlite4dummy.egg-info
 # source/sqlite4dummy
-tests
+# tests
 
 # Windows image file caches
 Thumbs.db
