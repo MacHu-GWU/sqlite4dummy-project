@@ -6,7 +6,8 @@ Since Sqlalchemy is the best, why another Sqlite API?
 	:width: 600 px
 	:align: center
 
-English doc
+
+Since Sqlalchemy is the best, why another Sqlite API?
 ---------------------------------------------------------------------------------------------------
 
 We already have an awesome project `Sqlalchemy <http://www.sqlalchemy.org/>`_,
@@ -25,7 +26,7 @@ At the end, if you don't need transaction, user group and love high performance 
 Now, let's see some real code example in :ref:`quick-start`.
 
 
-Chinese doc (中文文档)
+已经有了Sqlalchemy, 为啥还需要sqlite4dummy?
 ---------------------------------------------------------------------------------------------------
 
 为什么我们在已经有Sqlalchemy(下称SA)这么优秀的项目的情况下, 我们还要仅仅为sqlite
@@ -51,3 +52,11 @@ API慢几十倍甚至百倍。
 
 这就是我们重新创造一个面向数据分析人员, 而又提供比SA更加简化直观的API的
 sqlite4dummy, 让非计算机背景的人员也能轻松愉快的使用sqlite数据库带来的极大便利。
+
+
+Install
+---------------------------------------------------------------------------------------------------
+
+sqlite4dummy is released on PyPI, so all you need is::
+
+$ pip install sqlite4dummy

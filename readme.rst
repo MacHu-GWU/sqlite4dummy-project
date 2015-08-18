@@ -1,10 +1,6 @@
 sqlite4dummy, a high performance and easy to use Sqlite API for Data Scientist
 ===================================================================================================
 
-Required:
-
-Python3
-
 
 Since Sqlalchemy is the best, why another Sqlite API?
 ---------------------------------------------------------------------------------------------------
@@ -49,3 +45,11 @@ API慢几十倍甚至百倍。
 
 这就是我们重新创造一个面向数据分析人员, 而又提供比SA更加简化直观的API的
 sqlite4dummy, 让非计算机背景的人员也能轻松愉快的使用sqlite数据库带来的极大便利。
+
+
+Install
+---------------------------------------------------------------------------------------------------
+
+sqlite4dummy is released on PyPI, so all you need is::
+
+$ pip install sqlite4dummy
