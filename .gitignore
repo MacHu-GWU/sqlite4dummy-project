@@ -3,6 +3,8 @@
 *.db
 _source
 build
+dist
+sqlite4dummy.egg-info
 # source/sqlite4dummy
 tests
 

@@ -14,13 +14,13 @@ There are lots of optional Clause and generic Sql function can apply to a :class
 
 
 SQL Clause
-------------------------------
+---------------------------------------------------------------------------------------------------
 
 SQL Clause refers to Select SQL statement components.
 
 
 `WHERE Clause <http://www.w3schools.com/sql/sql_where.asp>`_
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Example::
 
@@ -33,7 +33,7 @@ For all supported arguments, go :meth:`~sqlite4dummy.schema.Select.where`
 
 
 `ORDER BY Clause <http://www.w3schools.com/sql/sql_orderby.asp>`_
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Example:
 
@@ -46,7 +46,7 @@ For all supported arguments, go :meth:`~sqlite4dummy.schema.Select.order_by`
 
 
 `LIMIT Clause <http://www.w3schools.com/sql/sql_top.asp>`_
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Example:
 
@@ -56,7 +56,7 @@ Example:
 
 
 OFFSET Clause
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Example:
 
@@ -66,7 +66,7 @@ Example:
 
 
 `DISTINCT Clause <http://www.w3schools.com/sql/sql_distinct.asp>`_
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Example:
 
@@ -76,7 +76,7 @@ Example:
 
 
 SELECT FROM Clause
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 SELECT FROM is actually execute a selection on results of another selection.
 
@@ -86,7 +86,7 @@ SELECT FROM is actually execute a selection on results of another selection.
 
 
 Execute Selection
-------------------------------
+---------------------------------------------------------------------------------------------------
 
 Suppose table's data is:
 
@@ -101,7 +101,7 @@ Suppose table's data is:
 
 
 Return Record
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -119,7 +119,7 @@ For more information go: :meth:`~sqlite4dummy.engine.Sqlite3Engine.select`
 
 
 Return Row
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -137,7 +137,7 @@ For more information go: :meth:`~sqlite4dummy.engine.Sqlite3Engine.select_row`
 
 
 Return dict
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -156,7 +156,7 @@ For more information go: :meth:`~sqlite4dummy.engine.Sqlite3Engine.select_dict`
 
 
 Return pandas.DataFrame
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `pandas.DataFrame <http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html>`_ is a column oriented, indexed 2d-array data structure. It's the top choice for analytic job in Python community.
 

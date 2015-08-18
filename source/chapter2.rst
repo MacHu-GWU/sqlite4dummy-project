@@ -25,7 +25,7 @@ Of course you can create table one by one using :meth:`sqlite4dummy.schema.Table
 
 
 Drop table
-------------------------------
+---------------------------------------------------------------------------------------------------
 
 drop one table:
 
@@ -51,7 +51,7 @@ You can also use Sqlite3Engine:
 
 
 Create index
-------------------------------
+---------------------------------------------------------------------------------------------------
 
 .. code-block:: python
 	
@@ -67,7 +67,7 @@ Create index
 
 
 Drop index
-------------------------------
+---------------------------------------------------------------------------------------------------
 
 .. code-block:: python
 	
@@ -87,7 +87,7 @@ You can also use Sqlite3Engine:
 
 
 Reflect metadata from existsing database
-------------------------------
+---------------------------------------------------------------------------------------------------
 
 Let's create table and index using built-in Python Sqlite3 API.
 

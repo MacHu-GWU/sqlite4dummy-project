@@ -1,5 +1,5 @@
 sqlite4dummy, a high performance and easy to use Sqlite API for Data Scientist
-=====================================================
+===================================================================================================
 
 Required:
 
@@ -7,7 +7,7 @@ Python3
 
 
 Since Sqlalchemy is the best, why another Sqlite API?
----------------------------
+---------------------------------------------------------------------------------------------------
 
 We already have an awesome project `Sqlalchemy <http://www.sqlalchemy.org/>`_,
 Why I rebuild the wheel again? And why only `Sqlite <https://www.sqlite.org/>`_?
@@ -24,7 +24,7 @@ At the end, if you don't need transaction, user group and love high performance 
 
 
 已经有了Sqlalchemy, 为啥还需要sqlite4dummy?
----------------------------
+---------------------------------------------------------------------------------------------------
 
 为什么我们在已经有Sqlalchemy(下称SA)这么优秀的项目的情况下, 我们还要仅仅为sqlite
 做一个新的API呢?

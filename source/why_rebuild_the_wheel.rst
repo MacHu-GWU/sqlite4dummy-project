@@ -7,7 +7,7 @@ Since Sqlalchemy is the best, why another Sqlite API?
 	:align: center
 
 English doc
------------
+---------------------------------------------------------------------------------------------------
 
 We already have an awesome project `Sqlalchemy <http://www.sqlalchemy.org/>`_,
 Why I rebuild the wheel again? And why only `Sqlite <https://www.sqlite.org/>`_?
@@ -26,7 +26,7 @@ Now, let's see some real code example in :ref:`quick-start`.
 
 
 Chinese doc (中文文档)
----------------------
+---------------------------------------------------------------------------------------------------
 
 为什么我们在已经有Sqlalchemy(下称SA)这么优秀的项目的情况下, 我们还要仅仅为sqlite
 做一个新的API呢?

@@ -4,7 +4,7 @@ Chapter3. Sqlite Engine
 Any operation has to be done via :class:`~sqlite4dummy.engine.Sqlite3Engine`. The engine is the most top class built on top of Column, Table, Index, MetaData, Insert, Select, Update and Delete.
 
 Connection and Cursor
-------------------------------
+---------------------------------------------------------------------------------------------------
 
 ``sqlite3.Connect`` and ``sqlite3.Cursor`` instance are hold as attributes of :class:`~sqlite4dummy.engine.Sqlite3Engine`.
 
@@ -18,7 +18,7 @@ You can call :meth:`sqlite4dummy.engine.Sqlite3Engine.execute` (some time :meth:
 
 
 Understand auto commit
-------------------------------
+---------------------------------------------------------------------------------------------------
 
 Like other relational database system, in sqlite3 you have to perform connect.commit() to make your change such as Insert and Update taken effects.
 
@@ -45,12 +45,12 @@ Manually do commit:
 
 
 Vanilla method
-------------------------------
+---------------------------------------------------------------------------------------------------
 
 sqlite4dummy minimize some frequently-used commands to let user's doing complex things in small piece of codes. Basically, it's just a syntax wrapper. But it's really helpful.
 
 :meth:`~sqlite4dummy.engine.Sqlite3Engine.howmany`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 return how many records in a table.
 
@@ -62,7 +62,8 @@ return how many records in a table.
 
 
 :meth:`~sqlite4dummy.engine.Sqlite3Engine.tabulate`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 return all records packed in a list in a table.
 
 .. code-block:: python
@@ -71,7 +72,8 @@ return all records packed in a list in a table.
 
 
 :meth:`~sqlite4dummy.engine.Sqlite3Engine.dictize`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 return all records in a column oriented view in a table.
 
 .. code-block:: python
@@ -81,7 +83,8 @@ return all records in a column oriented view in a table.
 
 
 :meth:`~sqlite4dummy.engine.Sqlite3Engine.to_df`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 return all records in pandas.DataFrame view in a table. `pandas <http://pandas.pydata.org/>`_ are required.
 
 .. code-block:: python

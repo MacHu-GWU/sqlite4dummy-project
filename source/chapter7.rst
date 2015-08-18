@@ -4,7 +4,7 @@ Chapter7. Delete data
 Deletion is simple locate sets of data, and remove them from table. So the syntax of :class:`~sqlite4dummy.schema.Delete` object is very similar to :class:`~sqlite4dummy.schema.Select`.
 
 Example
-------------------------------
+---------------------------------------------------------------------------------------------------
 
 .. code-block:: python
 	
