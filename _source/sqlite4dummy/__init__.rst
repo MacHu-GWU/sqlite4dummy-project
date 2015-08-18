@@ -10,7 +10,6 @@ subpackage and modules
 .. toctree::
    :maxdepth: 1
 
-	tests <tests/__init__>
 	dtype <dtype>
 	engine <engine>
 	func <func>

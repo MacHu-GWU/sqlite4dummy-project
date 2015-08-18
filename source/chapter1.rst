@@ -1,10 +1,12 @@
+.. _quick-start:
+
 Chapter1. Quick Start
 =====================
 
 First, let's connect to a database, create a table, then do some CRUD (CREATE, READ, UPDATE, DELETE).
 
 Connect to database, Create Table
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 .. code-block:: python
 
@@ -24,7 +26,7 @@ Connect to database, Create Table
 
 
 Insert some data
-~~~~~~~~~~~~~~~~
+------------------------------
 
 There's two ways: 
 
@@ -73,8 +75,9 @@ There's two ways:
 
 	engine.prt_all(employee) # print what we have inserted
 
+
 Select data
-~~~~~~~~~~~
+------------------------------
 
 select all
 
@@ -102,7 +105,7 @@ where clause
 
 
 Update data
-~~~~~~~~~~~
+------------------------------
 
 .. code-block:: python
 
@@ -115,7 +118,7 @@ Update data
 
 
 Delete data
-~~~~~~~~~~~
+------------------------------
 
 .. code-block:: python
 
@@ -124,3 +127,8 @@ Delete data
 	engine.delete(del_obj)
 
 	engine.prt_all(employee) # print data after we deleted some.
+
+Next
+------------------------------
+
+Now we are capable to do the basic things with database. Next, let's see how we do lower level operation on database, table and index.

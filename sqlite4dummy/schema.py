@@ -180,6 +180,15 @@ class Select():
             >>> from sqlite4dummy
             >>> s = S
             where(column1 >= 3.14, column2.between(1, 100), column3.like("%pattern%"))
+            
+        Supported operation:
+        
+            ``>``, ``>=``, ``<``, ``<=``, ``==``, ``!=``
+            
+        Supported criterion function:
+        
+            :meth:`~Column.between`, :meth:`~Column.like`, :meth:`~Column.in_`
+        
         """
         self.WHERE_clause = "WHERE\t%s" % "\n\tAND ".join([i.param for i in argv])
         return self
@@ -198,6 +207,8 @@ class Select():
         
             >>> s = Select(table.all).order_by(asc(table.c.column_name1),
                                                desc(table.c.column_nam2),)
+                                               
+        Sqlite support :meth:`~Column.asc`, :meth:`~Column.desc`.
         """
         priority = list()
         for i in argv:

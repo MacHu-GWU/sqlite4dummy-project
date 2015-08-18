@@ -119,13 +119,6 @@ class SelectUnittest(unittest.TestCase):
         print("{:=^100}".format("select distinct formatted sql"))
         print(s.sql)
      
-    def test_select_count(self):
-        movie = self.movie
-        r = func.count(movie.c._id)
-        s = Select([func.count(movie.c._id)])
-        print("{:=^100}".format("select count formatted sql"))
-        print(s.sql)
- 
     def test_select_from(self):
         movie = self.movie
         r = func.count(movie.c._id)

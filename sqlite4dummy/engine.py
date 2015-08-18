@@ -161,6 +161,7 @@ class PickleTypeConverter():
                        values=new_record)
         else:
             return Row(columns=self.table.column_names, values=record)
+        
 ###############################################################################
 #                            Sqlite3Engine class                              #
 ###############################################################################
@@ -188,6 +189,11 @@ class Sqlite3Engine():
         """Execute sql command.
         """
         return self.cursor.execute(*args, **kwarg)
+
+    def executemany(self, *args, **kwarg):
+        """Call generic sqlite3 API bulk insert method.
+        """
+        return self.cursor.executemany(*args, **kwarg)
     
     def commit(self):
         """Method for manually commit operation.
@@ -326,7 +332,8 @@ class Sqlite3Engine():
         """
         for chunk in grouper_list(generator, n=cache_size):
             self.insert_many_record(ins_obj, chunk)
-
+        self._commit()
+        
     def insert_row_stream(self, ins_obj, generator, cache_size=1024):
         """Another version of :meth:`Sqlite3Engine.insert_many_row`, take
         generator type input data stream.
@@ -342,7 +349,8 @@ class Sqlite3Engine():
         """
         for chunk in grouper_list(generator, n=cache_size):
             self.insert_many_row(ins_obj, chunk)
-    
+        self._commit()
+        
     # Execute Select
     def select(self, sel_obj, return_tuple=False):
         """Execute :class:`Select<sqlite4dummy.schema.Select>` object, 
@@ -474,6 +482,9 @@ class Sqlite3Engine():
                     self.update(upd_obj.\
                                 values(**values_kwarg).\
                                 where(*where_args))
+            except Exception as e:
+                print("Error message: %s" % e)
+                
         self._commit()
         
     def insdate_many_row(self, ins_obj, rows):
@@ -503,6 +514,8 @@ class Sqlite3Engine():
                     self.update(upd_obj.\
                                 values(**values_kwarg).\
                                 where(*where_args))
+            except Exception as e:
+                print("Error message: %s" % e)
                 
         self._commit()
         
@@ -525,6 +538,7 @@ class Sqlite3Engine():
         """
         try:
             self.execute("DROP TABLE %s" % table)
+            table.metadata._remove_table(table)
         except Exception as e:
             print(e)
             
@@ -537,6 +551,7 @@ class Sqlite3Engine():
         """
         try:
             self.execute("DROP INDEX %s" % index)
+            index.metadata._remove_index(index)
         except Exception as e:
             print(e)
     
@@ -549,6 +564,7 @@ class Sqlite3Engine():
         """
         try:
             self.execute("DELETE FROM %s" % table)
+            self._commit()
         except Exception as e:
             print(e)
         
@@ -578,6 +594,12 @@ class Sqlite3Engine():
         """Return all data in a table in json like, column oriented format.
         """
         return self.select_dict(Select(table.all))
+    
+    def to_df(self, table):
+        """Return all data and wrapped into a pandas.DataFrame object.
+        Faster than :meth:`Sqlite3Engine.dictize`.
+        """
+        return self.select_df(Select(table.all))
     
     def prt_all(self, table):
         """Print all records in a table.

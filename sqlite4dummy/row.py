@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 
 """
+.. _row-en:
+
 English Doc
 ~~~~~~~~~~~
 
-Row模块用于包装游标(Cursor)返回的数据。默认条件下游标返回的是元组(tuple)。而对 
-元组中的值进行访问只能通过位置索引, 并不是很方便, 也不方便对其编程。Row提供了     
-通过列名对值进行访问的方法, 一共有两种形式:
+By default the cursor returns record tuple. Row object is a package of record
+data, which provides two more way of visiting values by it's column name:
 
 1. ``Row.column_name``
 2. ``Row[column_name]``
@@ -83,7 +84,10 @@ Sure it also support ``in`` and ``==`` keyword:
     
     >>> row == Row(columns=["c1", "c2"], values=[1, 2])
     True
-    
+
+
+.. _row-cn:
+
 Chinese Doc (中文文档)
 ~~~~~~~~~~~~~~~~~~~~~~
 

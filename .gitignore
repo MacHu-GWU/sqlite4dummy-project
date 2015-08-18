@@ -1,6 +1,7 @@
 # MacHu Setting
 *.pyc
 *.db
+_source
 build
 source/sqlite4dummy
 tests
