@@ -1,3 +1,3 @@
 pushd "%~dp0"
-python3 -m unittest discover
+python -m unittest discover
 pause
