@@ -33,7 +33,7 @@ class TableUnittest(unittest.TestCase):
         self.assertEqual(self.table.table_name, "employee")
         
     def test_repr(self):
-#         print(repr(self.table))
+        print(repr(self.table))
         pass
     
     def test_iter(self):

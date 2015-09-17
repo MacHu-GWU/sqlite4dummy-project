@@ -9,4 +9,4 @@ from .schema import (Column, Table, Index, MetaData,
 from .func import func
 from .sql import and_, or_, asc, desc
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"

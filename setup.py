@@ -3,7 +3,7 @@
 
 from setuptools import setup
 
-SHORT_DESCRIPTION = ""
+SHORT_DESCRIPTION = "a high performance and easy to use Sqlite API for Data Scientist"
 
 with open("README.rst", "rb") as f:
     LONG_DESCRIPTION = f.read().decode("utf-8")
@@ -19,7 +19,7 @@ setup(
         ],
     package_data={"": ["LICENSE.txt"]},
     version = VERSION,
-    description = "a high performance and easy to use Sqlite API for Data Scientist",
+    description = SHORT_DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     author = "Sanhe Hu",
     author_email = "husanhe@gmail.com",

@@ -3,6 +3,9 @@
 
 """
 本Module用于初始化测试要用的数据库。
+
+class, method, func, exception
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
 from __future__ import print_function, unicode_literals

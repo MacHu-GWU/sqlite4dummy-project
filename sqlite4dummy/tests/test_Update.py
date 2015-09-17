@@ -10,6 +10,7 @@
 如果不想看具体分析, 直接看结论: 在关系数据库中, upsert意义不大, 而insert or
 update更有应用价值。
 
+
 INSERT AND UPDATE
 ~~~~~~~~~~~~~~~~~
 
