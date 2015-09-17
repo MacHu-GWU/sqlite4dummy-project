@@ -24,7 +24,7 @@ setup(
     author = "Sanhe Hu",
     author_email = "husanhe@gmail.com",
     url = "https://github.com/MacHu-GWU/sqlite4dummy-project",
-    download_url = "https://github.com/MacHu-GWU/sqlite4dummy-project/tarball/2015-08-18",
+    download_url = "https://github.com/MacHu-GWU/sqlite4dummy-project/tarball/2015-09-17",
     keywords = ["sqlite", "database", "data science"],
     license = "LGPL 3.0",
     classifiers = [],
