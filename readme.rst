@@ -1,7 +1,7 @@
 A high performance and easy to use sqlite API for Data Scientist.
 ================================================================================
 
-.. image:: http://sqlite4dummy-project.readthedocs.org/_images/sqlite4dummy_logo.jpg
+.. image:: http://sqlite4dummy-project.readthedocs.org/_static/sqlite4dummy_logo.jpg
 	:width: 500px
 	:height: 500px
 
@@ -63,7 +63,7 @@ Thank you for using ``sqlite4dummy``, for installation, click `here <install_>`_
 Chinese Introduction (中文介绍)
 --------------------------------------------------------------------------------
 
-``sqlite4dummy`` 是一个 ``sqlite`` 数据库的简单API库。 目的是**为数据分析人员, 和非数据库专业的开发者**使用数据提供一套: 类似人类的语言, 没有冗余代码, 不用写纯SQL语句的数据库解决方案。 让非计算机背景的数据分析人员也能轻松愉快的使用sqlite数据库带来的极大便利。
+``sqlite4dummy`` 是一个 ``sqlite`` 数据库的简单API库。 目的是 **为数据分析人员, 和非数据库专业的开发者** 使用数据提供一套: 类似人类的语言, 没有冗余代码, 不用写纯SQL语句的数据库解决方案。 让非计算机背景的数据分析人员也能轻松愉快的使用sqlite数据库带来的极大便利。
 
 - ``sqlite4dummy`` 能做什么?
 
@@ -81,7 +81,7 @@ Chinese Introduction (中文介绍)
 
 - 为什么要用 ``sqlite`` 数据库?
 
-	sqlite由于并没有很多其他关系数据库在运维方面的复杂功能, 所以使得**性能非常优异**。 这一特性**非常适合科学学科的工作者进行大容量的数据分析**。 例如在处理大于1G以上的csv文件时, 将所有数据放入数据库, 建立索引, 进行查找的速度要远远快于直接对数据文件进行处理。 
+	sqlite由于并没有很多其他关系数据库在运维方面的复杂功能, 所以使得 **性能非常优异**。 这一特性 **非常适合科学学科的工作者进行大容量的数据分析**。 例如在处理大于1G以上的csv文件时, 将所有数据放入数据库, 建立索引, 进行查找的速度要远远快于直接对数据文件进行处理。 
 
 	而R, Matlab等语言都需要将数据全部放入内存中才能进行处理。 而使用数据库作为中间件储存数据, 然后利用其高吞吐性能进行处理数据, 使得人们能掌控的数据量上限大大增加。
 
@@ -94,9 +94,9 @@ Chinese Introduction (中文介绍)
 
 	此外, SA在性能上有两个致命的弱点:
 
-	1. SA在执行 ``Select`` 的时候, 调用了一种叫做 ``Rowproxy`` 的机制, 将所有的行打包成字典, 方便我们进行读取。这一特性我们并不是100%的需要, 而我们完全可以在需要的时候, 再打包成字典。 这使得SA**在Select返回大量数据的情况下, 要比 ``sqlite4dummy`` 慢50%左右。**
+	1. SA在执行 ``Select`` 的时候, 调用了一种叫做 ``Rowproxy`` 的机制, 将所有的行打包成字典, 方便我们进行读取。这一特性我们并不是100%的需要, 而我们完全可以在需要的时候, 再打包成字典。 这使得SA **在Select返回大量数据的情况下, 要比 ``sqlite4dummy`` 慢50%左右。**
 
-	2. SA在执行 ``Insert`` 的时候, 如果发生了 ``primary key conflict``, 由于SA需要兼容所有的数据库,所以SA使用了 ``rollback`` 机制。 而由于sqlite3只支持单线程的write, 所以在处理冲突的时候要比多线程简单很多, 导致SA的速度在**当写入的数据与数据表中的数据有冲突的时候, 速度要比原生sqliteAPI慢几十倍甚至百倍。**
+	2. SA在执行 ``Insert`` 的时候, 如果发生了 ``primary key conflict``, 由于SA需要兼容所有的数据库,所以SA使用了 ``rollback`` 机制。 而由于sqlite3只支持单线程的write, 所以在处理冲突的时候要比多线程简单很多, 导致SA的速度在 **当写入的数据与数据表中的数据有冲突的时候, 速度要比原生sqliteAPI慢几十倍甚至百倍。**
 
 目前 ``sqlite4dummy`` 没有提供定义 ``foreign key`` 的语法, 但是你可以使用: ``Sqlite3Engine.execute("any sql...")`` 进行定义。 换言之, 所有 ``sqlite4dummy`` 没有的功能, 都可以通过这一方法调用原生的SQL语句完成。
 
