@@ -1,3 +1,5 @@
+.. _chapter3:
+
 Chapter3. Sqlite Engine
 ================================================================================
 
@@ -119,3 +121,5 @@ Next
 --------------------------------------------------------------------------------
 
 From next chapter, I gonna introduce more features about Insert, Select, Update and Delete.
+
+:ref:`Next Chapter <chapter4>`

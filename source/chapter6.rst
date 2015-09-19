@@ -1,3 +1,5 @@
+.. _chapter6:
+
 Chapter6. Insdate (Insert and update)
 ================================================================================
 
@@ -40,3 +42,5 @@ Next
 --------------------------------------------------------------------------------
 
 OK, we finished Update, let's move to Delete.
+
+:ref:`Next Chapter <chapter7>`

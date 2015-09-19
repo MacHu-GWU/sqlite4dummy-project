@@ -1,4 +1,4 @@
-.. _quick-start:
+.. _chapter1:
 
 Chapter1. Quick Start
 ================================================================================
@@ -134,3 +134,5 @@ Next
 --------------------------------------------------------------------------------
 
 Now we are capable to do the basic things with database. Next, let's see how we do lower level operation on database, table and index.
+
+:ref:`Next Chapter <chapter2>`

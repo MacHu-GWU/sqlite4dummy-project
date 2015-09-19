@@ -1,3 +1,5 @@
+.. _chapter2:
+
 Chapter2. Database Level Method
 ================================================================================
 
@@ -157,3 +159,5 @@ Next
 --------------------------------------------------------------------------------
 
 Let's move a little bit forward to the ``Sqlite3Engine``, once the table and index are defined, most of CRUD works have to be done with the engine.
+
+:ref:`Next Chapter <chapter3>`
