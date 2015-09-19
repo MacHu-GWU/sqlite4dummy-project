@@ -1,7 +1,8 @@
 Chapter3. Sqlite Engine
-=======================
+================================================================================
 
 Any operation has to be done via :class:`~sqlite4dummy.engine.Sqlite3Engine`. The engine is the most top class built on top of Column, Table, Index, MetaData, Insert, Select, Update and Delete.
+
 
 Connection and Cursor
 ---------------------------------------------------------------------------------------------------
@@ -91,5 +92,30 @@ return all records in pandas.DataFrame view in a table. `pandas <http://pandas.p
 
 	df = engine.to_df(table)
 	df["#column_name"] # get all column data
+
+
+:meth:`~sqlite4dummy.engine.Sqlite3Engine.prt_all`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+print all records in a table.
+
+.. code-block:: python
+
+	engine.prt_all(table) # this should print all data in a table
+
+
+:meth:`~sqlite4dummy.engine.Sqlite3Engine.remove_all`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+remove all data in a table by Table object (or by table name).
+
+.. code-block:: python
+
+	engine.remove_all(table)
+	engine.prt_all(table) # this should print no data.
+
+
+Next
+--------------------------------------------------------------------------------
 
 From next chapter, I gonna introduce more features about Insert, Select, Update and Delete.

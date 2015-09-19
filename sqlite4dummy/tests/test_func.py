@@ -6,7 +6,7 @@
 
 
 class, method, func, exception
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
 from __future__ import print_function, unicode_literals
@@ -18,7 +18,7 @@ from sqlite4dummy.tests.test_database_setting import (
 import unittest
 
 class SqlFuncUnittest(unittest.TestCase):
-    """:module:`sqlite4dummy.func` 的单元测试。
+    """Unittest of :mod:`sqlite4dummy.func`.
     """
     def setUp(self):
         self.metadata, self.table, self.engine = initial_all_dtype_database(

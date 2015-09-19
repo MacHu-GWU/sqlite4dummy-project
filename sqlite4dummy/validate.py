@@ -4,11 +4,12 @@
 """
 To prevent `SQL Injection attack <https://en.wikipedia.org/wiki/SQL_injection>`_
 the :class:`Validator` class performs basic check before initializing a 
-:class:`Column <sqlite4dummy.schema.Column>` , :class:`Table <sqlite4dummy.schema.Table>`,
+:class:`Column <sqlite4dummy.schema.Column>`, :class:`Table <sqlite4dummy.schema.Table>`,
 :class:`sqlite4dummy.schema.Index` 
 
+
 class, method, func, exception
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
 class ColumnNameError(Exception):
@@ -44,10 +45,10 @@ class Validator():
         if name[0].isdigit():
             raise ColumnNameError("Column name cannot start with number.")
         
-#         if name != name.lower():
-#             raise ColumnNameError("Warning: although column name is not "
-#                             "case sensitive in sqlite, but we recommend all "
-#                             "lower case column name.")
+        if name != name.lower():
+            raise ColumnNameError("Warning: although column name is not "
+                            "case sensitive in sqlite, but we recommend all "
+                            "lower case column name.")
             
     def exam_table_name(self, name):
         """Exam table name to avoid sql injection attack.
@@ -67,10 +68,10 @@ class Validator():
         if name[0].isdigit():
             raise TableNameError("Table name cannot start with number.")
         
-#         if name != name.lower():
-#             raise TableNameError("Warning: although table name is not "
-#                            "case sensitive in sqlite, but we recommend all "
-#                            "lower case table name.")
+        if name != name.lower():
+            raise TableNameError("Warning: although table name is not "
+                           "case sensitive in sqlite, but we recommend all "
+                           "lower case table name.")
         
     def exam_index_name(self, name):
         """Exam index name to avoid sql injection attack.

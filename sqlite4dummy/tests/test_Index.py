@@ -6,7 +6,7 @@
 
 
 class, method, func, exception
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
 from __future__ import print_function, unicode_literals
@@ -14,6 +14,8 @@ from sqlite4dummy import *
 import unittest
 
 class IndexUnittest(unittest.TestCase):
+    """Unittest of :class:`sqlite4dummy.schema.Index`.
+    """
     def setUp(self):
         self.metadata = MetaData()
         self.product = Table("product", self.metadata,

@@ -2,17 +2,15 @@
 # -*- coding: utf-8 -*-
 
 """
-本测试模块用于测试与Update有关的功能
-
+本测试模块用于测试与Update有关的功能。
 
 **关于Insert or update和Upsert的一些探讨**
 
 如果不想看具体分析, 直接看结论: 在关系数据库中, upsert意义不大, 而insert or
 update更有应用价值。
 
-
 INSERT AND UPDATE
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 尝试插入一条记录, 如果字段中包括Primary Key, 那么可能出现Integrity Error, 一旦
 发生冲突, 则使用WHERE主键Key定位到条目, 然后Update其他字段。
@@ -31,13 +29,13 @@ conflict!
 如果字段中不包括Primary Key, 则肯定能Insert成功。
 
 Upsert
-~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 在关系数据库的条件下, upsert仅对定义了所有的主键的update有效。
 
 
 class, method, func, exception
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
 from sqlite4dummy import *
@@ -49,6 +47,8 @@ import time
 import random
 
 class UpdateSqlUnittest(unittest.TestCase):
+    """Unittest of :class:`sqlite4dummy.schema.Update`.
+    """
     def setUp(self):
         self.metadata = MetaData()
         self.table = Table("test", self.metadata, 

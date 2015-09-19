@@ -3,18 +3,50 @@
 
 """
 English Doc
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TODO
+:class:`Sqlite3Engine` is the top class you are doing CRUD with. You could define
+the Engine by giving the database file path (for memory database, use 
+``":memory:"``).
+And this class provides full range of CRUD methods, it's simple, straight forward
+like a human language
+
+For all available methods, go :class:`Sqlite3Engine`.
+
+For example usage, click the link, and read the source code link:
+
+- :mod:`Create table<sqlite4dummy.tests.test_MetaData>`
+
+- :mod:`CREATE (Insert)<sqlite4dummy.tests.test_Insert>`
+- :mod:`READ (Select)<sqlite4dummy.tests.test_Select>`
+- :mod:`Update (Update)<sqlite4dummy.tests.test_Update>`
+- :mod:`Delete (Delete)<sqlite4dummy.tests.test_Delete>`
+
+- :mod:`Index <sqlite4dummy.tests.test_Index>`
 
 
 Chinese Doc (中文文档)
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+:class:`Sqlite3Engine` 这个类是我们使用 ``·sqlite4dummy`` 时主要所使用的类。他提供
+了一系列的简单易懂, 类似人类语言的方法完成我们常用的 "增删查改操作"。
+
+请前往 :class:`Sqlite3Engine` 查看我提供的所有方法。
+
+请前往这里查看所有的使用例子(点击source code按钮即可看到例子源代码)。
+
+- :mod:`建立表<sqlite4dummy.tests.test_MetaData>`
+
+- :mod:`增 (Insert)<sqlite4dummy.tests.test_Insert>`
+- :mod:`删 (Delete)<sqlite4dummy.tests.test_Delete>`
+- :mod:`查 (Select)<sqlite4dummy.tests.test_Select>`
+- :mod:`改 (Update)<sqlite4dummy.tests.test_Update>`
+
+- :mod:`建立索引 <sqlite4dummy.tests.test_Index>`
 
 
 class, method, func, exception
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
 from sqlite4dummy.row import Row
@@ -38,10 +70,25 @@ else:
     pk_protocol = 3
 
 class PickleTypeConverter():
-    """Compiled PickleType field converter object.
+    """High performance PickleType data converter Class.
     
-    Once the converted been compiled, then we can use built-in high performance 
-    batch process function map(func, iterable).
+    This is how we handle python type in sqlite database. If I have an entry::
+        
+        >>> record = (1, [1, 2, 3])
+        >>> new_record = convert(record)
+        >>> new_record # (1, pickle.dumps([1, 2, 3])
+        (1, b'\\x80\\x03]q\\x00(K\\x01K\\x02K\\x03e.')
+        
+    ``new_record`` is the one we saved in database. When I want to take data out,
+    I do it reversely. So basically I am doing this::
+    
+        picklable Python type <-- convert --> bytes
+        
+    The way I convert it is defined by the schema of the Table. So 
+    :class:`~PickleTypeConverter` takes a :class:`~sqlite4dummy.schema.Table` as
+    initialize argument. Then we compile the convert method. Once it is done, 
+    then we can make use of built-in high performance vectorize function 
+    map(func, iterable).
     
     **中文文档**
     
@@ -52,14 +99,15 @@ class PickleTypeConverter():
     
     在执行Select时, 需要cursor返回的tuple转换成被pickle解码后的Python对象。
     
-    在这两个过程中, 需要有所有涉及到的Column的相关信息。我们的做法是使用
-    self.table保存所有的MetaData, 然后利用map高性能并行处理函数, 批量转换数据。
+    在这两个过程中, 需要有所有涉及到的Column的相关信息。我们的做法是在初始化
+    PickleTypeConverter时绑定Table, 然后绑定convert方法。这样就可以利用map高性能
+    并行处理函数, 批量转换数据。
     """
     def __init__(self, table):
         self.table = table
 
     def convert_record(self, record):
-        """
+        """Covert PickleType value in record tuple to Blob.
         
         :param record: input tuple data.
         :type record: tuple or list
@@ -86,10 +134,11 @@ class PickleTypeConverter():
             return record
         
     def convert_row(self, row):
-        """
+        """Covert PickleType value in :class:`~sqlite4dummy.row.Row` object to 
+        Blob. Returns list.
         
         :param record: input Row object data.
-        :type record: :class:`sqlite4dummy.row.Row`
+        :type record: :class:`~sqlite4dummy.row.Row`
         :return: list that pickletype fields been converted. 
         
         **中文文档**
@@ -113,6 +162,14 @@ class PickleTypeConverter():
             return row.values
         
     def recover_tuple_record(self, record):
+        """Convert PickleType value in record tuple that naive Python sqlite3 
+        API returned to Python object, returns tuple. 
+        
+        **中文文档**
+        
+        将原生API cursor.execute("SELECT ...") 所返回的record tuple, 如果其中有
+        PickleType, 则转换会Python object。最终返回tuple。
+        """
         if len(self.table.pickletype_columns):
             new_record = list()
             for column, value in zip(self.table.all, record):
@@ -129,6 +186,14 @@ class PickleTypeConverter():
             return record
 
     def recover_list_record(self, record):
+        """Convert PickleType value in record tuple that naive Python sqlite3 
+        API returned to Python object, returns list. 
+        
+        **中文文档**
+        
+        将原生API cursor.execute("SELECT ...") 所返回的record tuple, 如果其中有
+        PickleType, 则转换会Python object。最终返回list。
+        """
         if len(self.table.pickletype_columns):
             new_record = list()
             for column, value in zip(self.table.all, record):
@@ -145,6 +210,15 @@ class PickleTypeConverter():
             return record
         
     def recover_row(self, record):
+        """Convert PickleType value in record tuple that naive Python sqlite3 
+        API returned to Python object, returns :class:`~sqlite4dummy.row.Row`. 
+        
+        **中文文档**
+        
+        将原生API cursor.execute("SELECT ...") 所返回的record tuple, 如果其中有
+        PickleType, 则转换会Python object。最终返回 
+        :class:`~sqlite4dummy.row.Row`。
+        """
         if len(self.table.pickletype_columns):
             column_names = list()
             new_record = list()
@@ -167,7 +241,54 @@ class PickleTypeConverter():
 ###############################################################################
 
 class Sqlite3Engine():
-    """A top API of sqlite3 engine.
+    """A High level API of sqlite3 engine.
+    
+    **Database Level**:
+    
+    - :meth:`~Sqlite3Engine.execute`
+    - :meth:`~Sqlite3Engine.execute_many`
+    - :meth:`~Sqlite3Engine.commit`
+    
+    **Insert**:
+    
+    - :meth:`~Sqlite3Engine.insert_record`
+    - :meth:`~Sqlite3Engine.insert_row`
+    - :meth:`~Sqlite3Engine.insert_many_record`
+    - :meth:`~Sqlite3Engine.insert_many_row`
+    - :meth:`~Sqlite3Engine.insert_record_stream`
+    - :meth:`~Sqlite3Engine.insert_row_stream`
+    
+    **Select**:
+    
+    - :meth:`~Sqlite3Engine.select`
+    - :meth:`~Sqlite3Engine.select_record`
+    - :meth:`~Sqlite3Engine.select_row`
+    - :meth:`~Sqlite3Engine.select_dict`
+    - :meth:`~Sqlite3Engine.select_df`
+    
+    **Update**:
+    
+    - :meth:`~Sqlite3Engine.update`
+    - :meth:`~Sqlite3Engine.insdate_many_record`
+    - :meth:`~Sqlite3Engine.insdate_many_row`
+    
+    **Delete**:
+    
+    - :meth:`~Sqlite3Engine.delete`
+    
+    **Vanilla method**: sets of syntax sugar methods to reduce the code you need.
+    
+    - :meth:`~Sqlite3Engine.howmany`
+    - :meth:`~Sqlite3Engine.tabulate`
+    - :meth:`~Sqlite3Engine.dictize`
+    - :meth:`~Sqlite3Engine.to_df`
+    - :meth:`~Sqlite3Engine.prt_all`
+    - :meth:`~Sqlite3Engine.remove_all`
+    
+    **Property method**: 
+    
+    - :meth:`~Sqlite3Engine.all_tablename`
+    - :meth:`~Sqlite3Engine.all_indexname`
     """
     def __init__(self, dbname, autocommit=True):
         self.dbname = dbname
@@ -186,27 +307,51 @@ class Sqlite3Engine():
             self.dbname, self.is_autocommit)
     
     def execute(self, *args, **kwarg):
-        """Execute sql command.
+        """Execute SQL command.
+        
+        **中文文档**
+        
+        执行原生
+        `Cursor.execute <https://docs.python.org/3.3/library/sqlite3.html#sqlite3.Cursor.execute>`_
+        方法。
         """
         return self.cursor.execute(*args, **kwarg)
 
     def executemany(self, *args, **kwarg):
         """Call generic sqlite3 API bulk insert method.
+        
+        **中文文档**
+        
+        执行原生
+        `Cursor.executemany <https://docs.python.org/3.3/library/sqlite3.html#sqlite3.Cursor.executemany>`_
+        方法。
         """
         return self.cursor.executemany(*args, **kwarg)
     
     def commit(self):
         """Method for manually commit operation.
+        
+        **中文文档**
+        
+        执行commit。
         """
         self.connect.commit()
 
     def commit_nothing(self):
         """Method for doing nothing.
+        
+        **中文文档**
+        
+        什么都不做。
         """
         pass
 
     def set_autocommit(self, flag):
-        """switch on or off autocommit
+        """Switch on or off autocommit.
+        
+        **中文文档**
+        
+        设置自动commit开关。
         """
         if flag:
             self.is_autocommit = True
@@ -217,7 +362,12 @@ class Sqlite3Engine():
     
     # non-compiled version of pickle record/row converter
     def convert_record(self, table, record):
-        """non-compiled version of pickle record converter
+        """Non-compiled version of pickle record converter.
+        
+        **中文文档**
+        
+        :meth:`PickleTypeConverter.convert_record` 的类似版本, 用于只执行一次的
+        insert和update的情况。
         """
         if len(table.pickletype_columns):
             new_record = list()
@@ -235,7 +385,12 @@ class Sqlite3Engine():
             return record
         
     def convert_row(self, table, row):
-        """non-compiled version of pickle row converter
+        """Non-compiled version of pickle row converter.
+        
+        **中文文档**
+        
+        :meth:`PickleTypeConverter.convert_row` 的类似版本, 用于只执行一次的
+        insert和update的情况。
         """
         if len(table.pickletype_columns):
             new_values = list()
@@ -256,11 +411,15 @@ class Sqlite3Engine():
     def insert_record(self, ins_obj, record):
         """Insert single record.
         
-        :param ins_obj: :class:`Insert<sqlite4dummy.schema.Insert>` object
-        :type ins_obj: :class:`Insert<sqlite4dummy.schema.Insert>`
+        :param ins_obj: :class:`~sqlite4dummy.schema.Insert` object
+        :type ins_obj: :class:`~sqlite4dummy.schema.Insert`
         
         :param record: tuple data.
         :type record: tuple
+        
+        **中文文档**
+        
+        插入单条tuple或list数据。
         """
         ins_obj.sql_from_record()
         self.cursor.execute(ins_obj.sql, self.convert_record(
@@ -270,11 +429,15 @@ class Sqlite3Engine():
     def insert_row(self, ins_obj, row):
         """Insert single Row.
         
-        :param ins_obj: :class:`Insert<sqlite4dummy.schema.Insert>` object
-        :type ins_obj: :class:`Insert<sqlite4dummy.schema.Insert>`
+        :param ins_obj: :class:`~sqlite4dummy.schema.Insert` object
+        :type ins_obj: :class:`~sqlite4dummy.schema.Insert`
         
-        :param row: :class:`Row<sqlite4dummy.row.Row>` data.
-        :type row: :class:`Row<sqlite4dummy.row.Row>`
+        :param row: :class:`~sqlite4dummy.row.Row` data.
+        :type row: :class:`~sqlite4dummy.row.Row`
+        
+        **中文文档**
+        
+        插入单条 :class:`~sqlite4dummy.row.Row` 数据。
         """
         ins_obj.sql_from_row(row)
         self.cursor.execute(ins_obj.sql, self.convert_row(
@@ -284,11 +447,15 @@ class Sqlite3Engine():
     def insert_many_record(self, ins_obj, records):
         """Insert many records, skip all primary-key conflict data.
         
-        :param ins_obj: :class:`Insert<sqlite4dummy.schema.Insert>` object
-        :type ins_obj: :class:`Insert<sqlite4dummy.schema.Insert>`
+        :param ins_obj: :class:`~sqlite4dummy.schema.Insert` object
+        :type ins_obj: :class:`~sqlite4dummy.schema.Insert`
         
         :param generator: data stream
         :type generator: generator
+        
+        **中文文档**
+        
+        插入多条tuple或list数据。
         """
         converter = PickleTypeConverter(ins_obj.table) # compile converter
         ins_obj.sql_from_record()
@@ -302,11 +469,15 @@ class Sqlite3Engine():
     def insert_many_row(self, ins_obj, rows):
         """Insert many Row, skip all primary-key conflict data.
         
-        :param ins_obj: :class:`Insert<sqlite4dummy.schema.Insert>` object
-        :type ins_obj: :class:`Insert<sqlite4dummy.schema.Insert>`
+        :param ins_obj: :class:`~sqlite4dummy.schema.Insert` object
+        :type ins_obj: :class:`~sqlite4dummy.schema.Insert`
         
         :param generator: data stream
         :type generator: generator
+        
+        **中文文档**
+        
+        插入多条 :class:`~sqlite4dummy.row.Row` 数据。
         """
         converter = PickleTypeConverter(ins_obj.table) # compile converter
         ins_obj.sql_from_row(rows[0])
@@ -318,34 +489,42 @@ class Sqlite3Engine():
         self._commit()
 
     def insert_record_stream(self, ins_obj, generator, cache_size=1024):
-        """Another version of :meth:`Sqlite3Engine.insert_many_record`, take
+        """Another version of :meth:`~Sqlite3Engine.insert_many_record`, take
         generator type input data stream.
         
-        :param ins_obj: :class:`Insert<sqlite4dummy.schema.Insert>` object
-        :type ins_obj: :class:`Insert<sqlite4dummy.schema.Insert>`
+        :param ins_obj: :class:`~sqlite4dummy.schema.Insert` object
+        :type ins_obj: :class:`~sqlite4dummy.schema.Insert`
         
         :param generator: data stream
         :type generator: generator
         
         :param cache_size: Execute how many data one at a time.
         :type cache_size: int
+        
+        **中文文档**
+        
+        以生成器形式插入多条tuple或list数据。
         """
         for chunk in grouper_list(generator, n=cache_size):
             self.insert_many_record(ins_obj, chunk)
         self._commit()
         
     def insert_row_stream(self, ins_obj, generator, cache_size=1024):
-        """Another version of :meth:`Sqlite3Engine.insert_many_row`, take
+        """Another version of :meth:`~Sqlite3Engine.insert_many_row`, take
         generator type input data stream.
         
-        :param ins_obj: :class:`Insert<sqlite4dummy.schema.Insert>` object
-        :type ins_obj: :class:`Insert<sqlite4dummy.schema.Insert>`
+        :param ins_obj: :class:`~sqlite4dummy.schema.Insert` object
+        :type ins_obj: :class:`~sqlite4dummy.schema.Insert`
         
         :param generator: data stream
         :type generator: generator
         
         :param cache_size: Execute how many data one at a time.
         :type cache_size: int
+        
+        **中文文档**
+        
+        以生成器的形式插入单条 :class:`~sqlite4dummy.row.Row` 数据。
         """
         for chunk in grouper_list(generator, n=cache_size):
             self.insert_many_row(ins_obj, chunk)
@@ -353,8 +532,12 @@ class Sqlite3Engine():
         
     # Execute Select
     def select(self, sel_obj, return_tuple=False):
-        """Execute :class:`Select<sqlite4dummy.schema.Select>` object, 
+        """Execute :class:`~sqlite4dummy.schema.Select` object, 
         if ``return_tuple=True``, yield ``tuple``, else, yield ``list``.
+        
+        **中文文档**
+        
+        执行 :class:`~sqlite4dummy.schema.Select` 对象, 返回tuple数据
         """
         adaptor = PickleTypeConverter(sel_obj._temp_table)
         if return_tuple:
@@ -365,20 +548,30 @@ class Sqlite3Engine():
                        self.cursor.execute(sel_obj.sql))
     
     def select_record(self, sel_obj, return_tuple=False):
-        """Alias of :meth:`Sqlite3Engine.select`
+        """Alias of :meth:`~Sqlite3Engine.select`
+        
+        **中文文档**
+        
+        :meth:`~Sqlite3Engine.select` 的同功能方法。
         """
         return self.select(sel_obj, return_tuple)
     
     def select_row(self, sel_obj):
-        """Execute :class:`Select<sqlite4dummy.schema.Select>` object, 
-        yield :class:`Row<sqlite4dummy.row.Row>` object.
+        """Execute :class:`~sqlite4dummy.schema.Select` object, 
+        yield :class:`~sqlite4dummy.row.Row` object.
+        
+        
+        **中文文档**
+        
+        执行 :class:`~sqlite4dummy.schema.Select` 对象, 返回
+        :class:`~sqlite4dummy.row.Row` 数据。
         """
         adaptor = PickleTypeConverter(sel_obj._temp_table)
         return map(adaptor.recover_row, 
                    self.cursor.execute(sel_obj.sql))
     
     def select_dict(self, sel_obj):
-        """Execute :class:`Select<sqlite4dummy.schema.Select>` object, 
+        """Execute :class:`~sqlite4dummy.schema.Select` object, 
         returns column oriented view of 2d-DataFrame.
         
         Example returns::
@@ -389,6 +582,10 @@ class Sqlite3Engine():
                 ...,
                 "columnN": [value1, value2, ...],
             }
+            
+        **中文文档**
+        
+        执行 :class:`~sqlite4dummy.schema.Select` 对象, 返回以列为导向的字典视图。
         """
         d = OrderedDict()
         for column_name in sel_obj._temp_table.column_names:
@@ -400,9 +597,16 @@ class Sqlite3Engine():
         return d
     
     def select_df(self, sel_obj):
-        """Execute :class:`Select<sqlite4dummy.schema.Select>` object, 
-        returns pandas.DataFrame column oriented view. Faster than 
-        :meth:`Sqlite3Engine.select_dict`.
+        """Execute :class:`~sqlite4dummy.schema.Select` object, 
+        returns 
+        `pandas.DataFrame <http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html>`_ 
+        column oriented view. Faster than :meth:`~Sqlite3Engine.select_dict`.
+        
+        **中文文档**
+        
+        执行 :class:`~sqlite4dummy.schema.Select` 对象, 返回
+        `pandas.DataFrame <http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html>`_
+        数据。
         """
         return pd.DataFrame(
             list(self.select(sel_obj)),
@@ -411,7 +615,11 @@ class Sqlite3Engine():
     
     # Execute Update
     def update(self, upd_obj):
-        """Execute :class:`Update<sqlite4dummy.schema.Update>` object.
+        """Execute :class:`~sqlite4dummy.schema.Update` object.
+        
+        **中文文档**
+        
+        执行 :class:`~sqlite4dummy.schema.Update` 对象。
         """
         self.cursor.execute(upd_obj.sql)
         self._commit()
@@ -488,7 +696,12 @@ class Sqlite3Engine():
         self._commit()
         
     def insdate_many_row(self, ins_obj, rows):
-        """Another version taking :class:`Row<sqlite4dummy.row.Row>` object data.
+        """Another version taking :class:`~sqlite4dummy.row.Row` object data.
+        
+        **中文文档**
+        
+        :meth:`~Sqlite3Engine.insdate_many_record` 的同功能方法, 只不过接受的是
+        :class:`~sqlite4dummy.row.Row` 数据。
         """
         upd_obj = ins_obj.table.update()
         
@@ -521,7 +734,11 @@ class Sqlite3Engine():
         
     # Execute Delete
     def delete(self, del_obj):
-        """Execute :class:`Delete<sqlite4dummy.schema.Delete>` object.
+        """Execute :class:`~sqlite4dummy.schema.Delete` object.
+        
+        **中文文档**
+        
+        执行 :class:`~sqlite4dummy.schema.Delete` 对象。
         """
         self.cursor.execute(del_obj.sql)
         self._commit()
@@ -539,8 +756,11 @@ class Sqlite3Engine():
         try:
             self.execute("DROP TABLE %s" % table)
             table.metadata._remove_table(table)
-        except Exception as e:
-            print(e)
+        except sqlite3.OperationalError as e:
+            raise e
+        except:
+            print("Argument has to be a Table object or a table name.")
+            raise
             
     def drop_index(self, index):
         """Drop an index by Index object (or by index name).
@@ -552,21 +772,11 @@ class Sqlite3Engine():
         try:
             self.execute("DROP INDEX %s" % index)
             index.metadata._remove_index(index)
-        except Exception as e:
-            print(e)
-    
-    def delete_table(self, table):
-        """Delete all data in a table by Table object (or by table name).
-        
-        **中文文档**
-        
-        删除某个表中的数据。接受Table对象或table name字符串。
-        """
-        try:
-            self.execute("DELETE FROM %s" % table)
-            self._commit()
-        except Exception as e:
-            print(e)
+        except sqlite3.OperationalError as e:
+            raise e
+        except:
+            print("Argument has to be an Index object or an index name.")
+            raise
         
     # Vanilla method
     def howmany(self, table):
@@ -582,22 +792,37 @@ class Sqlite3Engine():
         try:
             return self.execute("SELECT COUNT(*) FROM (SELECT * FROM %s)" % table).\
                 fetchone()[0]
+        except sqlite3.OperationalError as e:
+            raise e
         except:
-            Exception("Argument has to be a Table object or a table name.")
-    
+            print("Argument has to be a Table object or a table name.")
+            raise
+        
     def tabulate(self, table):
         """Return all data in a table in list of records format.
+        
+        **中文文档**
+        
+        以**list of list**的形式返回表中**所有**数据
         """
         return list(self.select(Select(table.all)))
     
     def dictize(self, table):
         """Return all data in a table in json like, column oriented format.
+        
+        **中文文档**
+        
+        以**字典视图**的形式返回表中**所有**数据
         """
         return self.select_dict(Select(table.all))
     
     def to_df(self, table):
         """Return all data and wrapped into a pandas.DataFrame object.
-        Faster than :meth:`Sqlite3Engine.dictize`.
+        Faster than :meth:`~Sqlite3Engine.dictize`.
+        
+        **中文文档**
+        
+        以**pandas.DataFrame**的形式返回表中**所有**数据
         """
         return self.select_df(Select(table.all))
     
@@ -617,9 +842,29 @@ class Sqlite3Engine():
             counter += 1
             print(record)
         print("%s records returns" % counter)
-    
+
+    def remove_all(self, table):
+        """Remove all data in a table by Table object (or by table name).
+        
+        **中文文档**
+        
+        删除某个表中的数据。接受Table对象或table name字符串。
+        """
+        try:
+            self.execute("DELETE FROM %s" % table)
+            self._commit()
+            print("All data in %s has been removed, (index is keeped)" % table)
+        except sqlite3.OperationalError as e:
+            raise e
+            
     @property
     def all_tablename(self):
+        """Returns list of table name in this database.
+        
+        **中文文档**
+        
+        返回数据库中的所有表名的list。
+        """
         tablename_list = list()
         for record in self.execute(
             "SELECT name FROM sqlite_master WHERE type = 'table'"):
@@ -628,6 +873,12 @@ class Sqlite3Engine():
     
     @property
     def all_indexname(self):
+        """Returns list of index name in this database.
+        
+        **中文文档**
+        
+        返回数据库中的所有索引名的list。
+        """
         indexname_list = list()
         for record in self.execute(
             "SELECT name FROM sqlite_master "
@@ -695,19 +946,25 @@ if __name__ == "__main__":
             ) = initial_all_dtype_database(needdata=True)
         
         def test_howmany(self):
-            self.assertEqual(self.engine.howmany(self.table), 1000)
-            
+            self.assertEqual(self.engine.howmany(self.table), total)
+             
         def test_tabulate(self):
-            self.assertEqual(len(self.engine.tabulate(self.table)), 1000)
-            
+            self.assertEqual(len(self.engine.tabulate(self.table)), total)
+             
         def test_dictize(self):
             self.assertEqual(len(self.engine.dictize(self.table)), 8)
-            self.assertEqual(len(self.engine.dictize(self.table)["_id"]), 1000)
-            
+            self.assertEqual(len(self.engine.dictize(self.table)["_id"]), total)
+             
         def test_prt_all(self):
             self.engine.prt_all(self.table)
-#             print(self.engine.tabulate(self.table))
-#             print(self.engine.dictize(self.table))
+            print(self.engine.tabulate(self.table))
+            print(self.engine.dictize(self.table))
+        
+        def test_remove_all(self):
+            self.engine.remove_all("test")
             
-                
+        def test_property_method(self):
+            self.assertEqual(self.engine.all_tablename, ["test"])
+            self.assertEqual(self.engine.all_indexname, [])
+            
     unittest.main()

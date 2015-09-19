@@ -1,11 +1,9 @@
-Sqlite for Dummies: Write Sql in human language
-===============================================
 
-.. include:: why_rebuild_the_wheel.rst
+.. include:: long_description.rst
 
 
 Table of Contents
------------------
+--------------------------------------------------------------------------------
 
 .. toctree::
    :maxdepth: 3
@@ -22,7 +20,7 @@ Table of Contents
 .. _indice-and-tables:
 
 Indices and tables
-------------------
+--------------------------------------------------------------------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

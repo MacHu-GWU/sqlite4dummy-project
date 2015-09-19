@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 """
-本测试模块用于测试与:class:`sqlite4dummy.schema.Column`有关的方法
+本测试模块用于测试与 :class:`sqlite4dummy.schema.Column` 有关的方法
 
 
 class, method, func, exception
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
 from sqlite4dummy import *
@@ -14,7 +14,9 @@ from datetime import datetime, date
 import unittest
 
 class ColumnUnittest(unittest.TestCase):
-    """Column的方法的单元测试。
+    """Unittest of :class:`sqlite4dummy.schema.Column`.
+    
+    Column的方法的单元测试。
     """
     def test_str_and_repr(self):
         column = Column("_id", dtype.INTEGER,

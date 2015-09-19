@@ -6,7 +6,7 @@
 
 
 class, method, func, exception
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 from __future__ import print_function, unicode_literals
 from sqlite4dummy import *
@@ -16,6 +16,8 @@ import unittest
 import time
 
 class SelectUnittest(unittest.TestCase):
+    """Unittest of :class:`sqlite4dummy.schema.Select`.
+    """
     def setUp(self):
         self.metadata = MetaData()
         self.movie = Table("movie", self.metadata, 

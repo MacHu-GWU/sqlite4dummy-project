@@ -6,7 +6,7 @@
 
 
 class, method, func, exception
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
 from sqlite4dummy import *
@@ -14,7 +14,7 @@ from pprint import pprint as ppt
 import unittest
 
 class TableUnittest(unittest.TestCase):
-    """Table的方法的单元测试。
+    """Unittest of :class:`sqlite4dummy.schema.Table`.
     """
     def setUp(self):
         self.table = Table("employee", MetaData(),
@@ -33,7 +33,7 @@ class TableUnittest(unittest.TestCase):
         self.assertEqual(self.table.table_name, "employee")
         
     def test_repr(self):
-        print(repr(self.table))
+#         print(repr(self.table))
         pass
     
     def test_iter(self):

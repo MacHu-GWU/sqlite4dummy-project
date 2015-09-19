@@ -5,7 +5,7 @@
 .. _row-en:
 
 English Doc
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default the cursor returns record tuple. Row object is a package of record
 data, which provides two more way of visiting values by it's column name:
@@ -89,7 +89,7 @@ Sure it also support ``in`` and ``==`` keyword:
 .. _row-cn:
 
 Chinese Doc (中文文档)
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Row模块用于包装游标(Cursor)返回的数据。默认条件下游标返回的是元组(tuple)。而对 
 元组中的值进行访问只能通过位置索引, 并不是很方便, 也不方便对其编程。Row提供了     
@@ -172,7 +172,7 @@ Row模块用于包装游标(Cursor)返回的数据。默认条件下游标返回
     True
     
 class, method, func, exception
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
 from collections import OrderedDict

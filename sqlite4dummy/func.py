@@ -2,9 +2,16 @@
 # -*- coding: utf-8 -*-
 
 """
+This module implements SQL generic functions like: count, max, min, abs, etc...
+
+For more information about Sqlite understood function, see:
+https://www.sqlite.org/lang_corefunc.html
+
+For usage example, go :mod:`unittest page<sqlite4dummy.tests.test_func>`
+and read the testcase source code.
 
 class, method, func, exception
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
 from sqlite4dummy.dtype import dtype
@@ -13,12 +20,9 @@ from sqlite4dummy.sql import SQL_Param
 
 class SqlFunction():
     """
-    Implement Sql generic functions.
+    Implement SQL generic functions.
     
-    All method can only take Column object argument.
-    
-    For more information about Sqlite understood function, see:
-    https://www.sqlite.org/lang_corefunc.html
+    All method can only take :class:`~sqlite4dummy.schema.Column` object argument.
     
     **中文文档**
     

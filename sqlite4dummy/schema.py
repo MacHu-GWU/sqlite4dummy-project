@@ -15,8 +15,9 @@ Important class quick link:
 - :class:`Update`
 - :class:`Delete`
 
+
 Chinese Doc (中文文档)
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 本模块是sqlite4dummy的核心模块, 定义了面向对象的数据库中重要概念的抽象类。
 
@@ -31,8 +32,9 @@ Chinese Doc (中文文档)
 - :class:`Update`: 改
 - :class:`Delete`: 删
 
+
 class, method, func, exception
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
 from collections import OrderedDict, namedtuple
@@ -57,6 +59,9 @@ class Insert():
     :meth:`insert_record<sqlite4dummy.engine.Sqlite3Engine.insert_record>`
     and other method to perform record/Row insert, bulk insert, smart insert
     and update (insdate).
+    
+    For usage example, go :mod:`unittest page<sqlite4dummy.tests.test_Insert>`
+    and read the testcase source code.
     
     **中文文档**
     
@@ -123,7 +128,10 @@ class Select():
     To create a Select object, you have to name a list of Column object has to 
     select. And use where(), limit(), offset(), distinct(), order_by() method 
     to specify your selection.
-        
+
+    For usage example, go :mod:`unittest page<sqlite4dummy.tests.test_Select>`
+    and read the testcase source code.
+
     **中文文档**
     
     Select语句的面向对象形式的定义类。
@@ -289,7 +297,10 @@ class Update():
         UPDATE    test
         SET    _value = 3.14
         WHERE    test._id = 1
-    
+
+    For usage example, go :mod:`unittest page<sqlite4dummy.tests.test_Update>`
+    and read the testcase source code.
+
     **中文文档**
     
     Update语句的面向对象形式的定义类。
@@ -372,6 +383,9 @@ class Delete():
     
     The :meth:`Delete.where` method specifies which record or records that should 
     be deleted. If you omit the WHERE clause, all records will be deleted!
+
+    For usage example, go :mod:`unittest page<sqlite4dummy.tests.test_Delete>`
+    and read the testcase source code.
     
     **中文文档**
     
@@ -431,6 +445,9 @@ class Column():
     
     :param primary_key: (default False) whether it is a primary_key.
     :type primary_key: boolean
+    
+    For usage example, go :mod:`unittest page<sqlite4dummy.tests.test_Column>`
+    and read the testcase source code.
     """
     def __init__(self, column_name, data_type, 
                  nullable=True, default=None, primary_key=False):
@@ -698,6 +715,9 @@ class Table():
     :param args: list of Column object
     :type args: :class:`Column`
 
+    For usage example, go :mod:`unittest page<sqlite4dummy.tests.test_Table>`
+    and read the testcase source code.
+    
     **中文文档**
     
     数据表对象
@@ -851,6 +871,9 @@ class Index():
     
     :param unique: (default False) Whether it's an unique index.
     :type unique: boolean
+
+    For usage example, go :mod:`unittest page<sqlite4dummy.tests.test_Index>`
+    and read the testcase source code.
 
     **中文文档**
     

@@ -1,5 +1,5 @@
 Chapter4. More about Insert
-===========================
+================================================================================
 
 Except :meth:`~sqlite4dummy.engine.Sqlite3Engine.insert_record`, :class:`~sqlite4dummy.engine.Sqlite3Engine` also provides:
 
@@ -17,7 +17,7 @@ Before you proceed, first you should understand the :mod:`Row Proxy<sqlite4dummy
 Once you get understand :mod:`Row Proxy<sqlite4dummy.row>`, let's see more features about Insert.
 
 Insert a Row object
----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 Insert one Row object at a time. If conflict with constrain, raise Errors.
 
@@ -37,7 +37,7 @@ Insert one Row object at a time. If conflict with constrain, raise Errors.
 .. _insert-many-record-tuple:
 
 Insert many record tuple
----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 Insert list of records, automatically skip Exceptions.
 
@@ -51,7 +51,7 @@ Insert list of records, automatically skip Exceptions.
 .. _insert-many-row-object:
 
 Insert many Row object
----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 Insert list of Row objects, automatically skip Exceptions.
 
@@ -69,7 +69,7 @@ Insert list of Row objects, automatically skip Exceptions.
 
 
 Insert many record tuple in a generator stream
----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 Similar to :ref:`insert-many-record-tuple`, but work with a record tuple generator.
 
@@ -85,7 +85,7 @@ Similar to :ref:`insert-many-record-tuple`, but work with a record tuple generat
 
 
 Insert many Row object in a generator stream
----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 Similar to :ref:`insert-many-row-object`, but work with a Raw object generator.
 
@@ -104,3 +104,9 @@ Similar to :ref:`insert-many-row-object`, but work with a Raw object generator.
 
 	ins = table.insert()
 	engine.insert_many_row(ins, row_generator())
+
+
+Next
+--------------------------------------------------------------------------------
+
+OK, we finished Insert, let's move to Select.

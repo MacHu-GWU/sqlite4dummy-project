@@ -6,7 +6,7 @@
 
 
 class, method, func, exception
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
 from sqlite4dummy import *
@@ -14,7 +14,9 @@ from datetime import datetime, date
 import unittest
 
 class MetaDataUnittest(unittest.TestCase):
-    """MetaData的方法的单元测试。
+    """Unittest of :class:`sqlite4dummy.schema.MetaData`.
+    
+    MetaData的方法的单元测试。
     """
     def setUp(self):
         self.engine = Sqlite3Engine(":memory:", autocommit=False)

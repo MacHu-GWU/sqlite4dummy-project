@@ -2,17 +2,37 @@
 # -*- coding: utf-8 -*-
 
 """
+English Doc
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 Chinese Doc (中文文档)
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 sqlite3中所支持的, 以及我们常用到的数据类型有:
 
-- INTEGER: 整数 (sqlite3不支持布尔值, 用整数的0和1代替)
-- REAL: 小数
-- STRING:
+- :class:`TEXT`: 字符串
+- :class:`INTEGER`: 整数 (sqlite3不支持布尔值, 用整数的0和1代替)
+- :class:`REAL`: 小数
+- :class:`BLOB`: bytes, 字节码
+- :class:`DATE`: 日期
+- :class:`DATETIME`: 日期时间
+- :class:`PICKLETYPE`: 任意 
+  `pickable <https://docs.python.org/2/library/pickle.html#what-can-be-pickled-and-unpickled>`_ 
+  的Python对象。
+
+由于我们定义了一个这些所有 :class:`DataType` 的实例, 所以访问这些数据类型是, 可以
+直接使用::
+
+    >>> from sqlite4dummy import * # dtype been imported
+    >>> dtype.TEXT
+    TEXT
+    >>> dtype.DATETIME
+    DATETIME
+
 
 class, method, func, exception
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
 from datetime import datetime, date
@@ -27,7 +47,7 @@ else:
     pk_protocol = 3
     
 def bytestr2hexstring(bytestr):
-    """convert byte string to hex string.
+    """Convert byte string to hex string.
     
     Example::
     

@@ -6,8 +6,9 @@
 
 
 class, method, func, exception
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
+
 from sqlite4dummy import *
 from datetime import datetime, date
 from pprint import pprint as ppt
@@ -17,6 +18,8 @@ import time
 import random
 
 class InsertUnittest(unittest.TestCase):
+    """Unittest of :class:`sqlite4dummy.schema.Insert`.
+    """
     def setUp(self):
         self.metadata = MetaData()
         self.movie = Table("movie", self.metadata, 

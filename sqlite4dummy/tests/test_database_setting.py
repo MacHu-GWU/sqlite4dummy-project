@@ -2,10 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-本Module用于初始化测试要用的数据库。
-
-class, method, func, exception
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+本Module用于初始化生成测试要用的数据库。
 """
 
 from __future__ import print_function, unicode_literals
@@ -46,6 +43,8 @@ def random_datetime():
     return datetime(2000, 1, 1, 0, 0, 0) + \
         timedelta(seconds=random.randint(0, 365*24*3600))
 
+total = 1000
+
 def initial_all_dtype_database(needdata=False):
     """
     
@@ -71,14 +70,14 @@ def initial_all_dtype_database(needdata=False):
         ins = table.insert()
         data = [(
             i,
-            random.randint(1, 1000),
+            random.randint(1, total),
             random.random() - 0.5,
             random_text(),
             random_date(),
             random_datetime(),
             random_text().encode("utf-8"),
             [1, 2, 3],
-            ) for i in range(1, 1000+1)]
+            ) for i in range(1, total+1)]
         engine.insert_many_record(ins, data)
         engine.commit()
     
@@ -106,7 +105,7 @@ def initial_has_pickle(needdata=False):
             [random.randint(1, 32), 
              random.randint(1, 32), 
              random.randint(1, 32),],
-            ) for i in range(1, 1000+1)]
+            ) for i in range(1, total+1)]
         engine.insert_many_record(ins, data)
         engine.commit()
         
@@ -129,7 +128,7 @@ def initial_no_pickle(needdata=False):
     
     if needdata:
         ins = table.insert()
-        data = [(i, random_text()) for i in range(1, 1000+1)]
+        data = [(i, random_text()) for i in range(1, total+1)]
         engine.insert_many_record(ins, data)
         engine.commit()
         
@@ -141,17 +140,17 @@ if __name__ == "__main__":
     class TestDatabaseUnittest(unittest.TestCase):
         def test_initial_all_dtype_database(self):
             metadata, table, engine = initial_all_dtype_database(needdata=True)
-            self.assertEqual(engine.howmany(table), 1000)
+            self.assertEqual(engine.howmany(table), total)
             engine.prt_all(table)
 
         def test_initial_has_pickle(self):
             metadata, table, engine = initial_has_pickle(needdata=True)
-            self.assertEqual(engine.howmany(table), 1000)
+            self.assertEqual(engine.howmany(table), total)
             engine.prt_all(table)
 
         def test_initial_no_pickle(self):
             metadata, table, engine = initial_no_pickle(needdata=True)
-            self.assertEqual(engine.howmany(table), 1000)
+            self.assertEqual(engine.howmany(table), total)
             engine.prt_all(table)
             
     unittest.main()

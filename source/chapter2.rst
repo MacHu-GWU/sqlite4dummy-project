@@ -1,5 +1,5 @@
 Chapter2. Database Level Method
-===============================
+================================================================================
 
 At database level, we can create/remove Table/Index, get Table/Index's schema. Let's learn
 
@@ -25,7 +25,7 @@ Of course you can create table one by one using :meth:`sqlite4dummy.schema.Table
 
 
 Drop table
----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 drop one table:
 
@@ -51,7 +51,7 @@ You can also use Sqlite3Engine:
 
 
 Create index
----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 .. code-block:: python
 	
@@ -67,7 +67,7 @@ Create index
 
 
 Drop index
----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 .. code-block:: python
 	
@@ -87,7 +87,7 @@ You can also use Sqlite3Engine:
 
 
 Reflect metadata from existsing database
----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 Let's create table and index using built-in Python Sqlite3 API.
 
@@ -151,3 +151,9 @@ Now you can easily play with Table, Index, Column object like this:
 	# access Index instance
 	number_value_index = metadata.get_index("number_value_index")
 	article_content_index = metadata.get_index("article_content_index")
+
+
+Next
+--------------------------------------------------------------------------------
+
+Let's move a little bit forward to the ``Sqlite3Engine``, once the table and index are defined, most of CRUD works have to be done with the engine.
