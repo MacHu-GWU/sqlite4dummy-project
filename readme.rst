@@ -11,7 +11,7 @@ Quick links:
 - `Online Documentation <http://sqlite4dummy-project.readthedocs.org/>`_
 - `PyPI download <https://pypi.python.org/pypi/sqlite4dummy>`_
 - `PDF Manual <https://media.readthedocs.org/pdf/sqlite4dummy-project/latest/sqlite4dummy-project.pdf>`_
-- `Install <install_>`_.
+- `Install <install_>`_
 
 
 English Introduction
