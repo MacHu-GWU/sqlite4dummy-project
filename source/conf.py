@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # sqlite4dummy documentation build configuration file, created by
-# sphinx-quickstart on Wed Aug 12 16:59:47 2015.
+# sphinx-quickstart on Sat Sep 19 23:10:39 2015.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -35,8 +35,11 @@ sys.path.append(os.path.abspath('..'))
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
+    'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
+    'sphinx.ext.mathjax',
+    'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
 ]
 
@@ -122,7 +125,7 @@ html_theme = 'nature'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-# html_theme_options = {}
+#html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
@@ -361,5 +364,9 @@ epub_exclude_files = ['search.html']
 
 # If false, no index is generated.
 #epub_use_index = True
+
+
+# Example configuration for intersphinx: refer to the Python standard library.
+intersphinx_mapping = {'https://docs.python.org/': None}
 
 autodoc_member_order = 'bysource'
