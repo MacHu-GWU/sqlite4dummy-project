@@ -1,7 +1,7 @@
 A high performance and easy to use sqlite API for Data Scientist.
 ================================================================================
 
-.. image:: _static\sqlite4dummy_logo.jpg
+.. image:: _static\sqlite4dummy-logo.jpg
 	:width: 500px
 	:height: 500px
 
