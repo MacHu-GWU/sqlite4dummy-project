@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+Quick Link:
+
+- GitHub: https://github.com/MacHu-GWU/sqlite4dummy-project
+- PyPI: https://pypi.python.org/pypi/sqlite4dummy
+- Document: http://sqlite4dummy-project.readthedocs.org/
+"""
+
 from .dtype import dtype
 from .engine import Sqlite3Engine
 from .row import Row
