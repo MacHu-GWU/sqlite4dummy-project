@@ -34,17 +34,14 @@ sqlite3中所支持的, 以及我们常用到的数据类型有:
 class, method, func, exception
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
+try:
+    from sqlite4dummy.pycompatible import pk_protocol, is_py3 
+except:
+    from .pycompatible import pk_protocol, is_py3
 
 from datetime import datetime, date
 import binascii
 import pickle
-import sys
-
-is_py2 = (sys.version_info[0] == 2)
-if is_py2:
-    pk_protocol = 2
-else:
-    pk_protocol = 3
     
 def bytestr2hexstring(bytestr):
     """Convert byte string to hex string.
@@ -130,7 +127,10 @@ class BLOB(BaseDataType):
     sqlite_name = "BLOB"
 
     def to_sql_param(self, value):
-        return "X%s" % str(binascii.hexlify(value))[1:]
+        if is_py3:
+            return "X%s" % str(binascii.hexlify(value))[1:]
+        else:
+            return "X'%s'" % str(binascii.hexlify(value))
 
     def from_sql_param(self, text):
         if text == None:
@@ -179,9 +179,14 @@ class PICKLETYPE(BaseDataType):
     sqlite_name = "BLOB"
 
     def to_sql_param(self, value):
-        return "X%s" % str(
-            binascii.hexlify(pickle.dumps(value, protocol=pk_protocol))
-            )[1:]
+        if is_py3:
+            return "X%s" % str(
+                binascii.hexlify(pickle.dumps(value, protocol=pk_protocol))
+                )[1:]
+        else:
+            return "X'%s'" % str(
+                binascii.hexlify(pickle.dumps(value, protocol=pk_protocol))
+                )
         
     def from_sql_param(self, text):
         if text == None:
@@ -236,7 +241,7 @@ if __name__ == "__main__":
             self.assertEqual(dtype.DATE.name, "DATE")
             self.assertEqual(dtype.DATETIME.name, "DATETIME")
             self.assertEqual(dtype.PICKLETYPE.name, "PICKLETYPE")
-
+ 
             self.assertEqual(dtype.TEXT.sqlite_name, "TEXT")
             self.assertEqual(dtype.INTEGER.sqlite_name, "INTEGER")
             self.assertEqual(dtype.REAL.sqlite_name, "REAL")
@@ -244,7 +249,7 @@ if __name__ == "__main__":
             self.assertEqual(dtype.DATE.sqlite_name, "DATE")
             self.assertEqual(dtype.DATETIME.sqlite_name, "TIMESTAMP")
             self.assertEqual(dtype.PICKLETYPE.sqlite_name, "BLOB")
-        
+         
         def test_get_dtype_by_name(self):
             self.assertEqual(dtype.get_dtype_by_name("TEXT"), dtype.TEXT)
             self.assertEqual(dtype.get_dtype_by_name("INTEGER"), dtype.INTEGER)
@@ -255,9 +260,15 @@ if __name__ == "__main__":
         
         def test_to_sql_param_and_from_sql_param(self):
             """测试to_sql_param方法使能能将值正确的转换成sql语句。
+            
+            注意!! 该测试在Python2中无法通过！ 因为Python2中对于Blob的列, 无法
+            正确地使用 SELECT * FROM table WHERE column = X'80025d71002'; 这样
+            的形式去匹配。所以在Python2中PickleType只能被读写, 不能被WHERE筛选。
+            但可以使用NOT NULL关键字。
             """
-            connect = sqlite3.connect(":memory:", 
-                                      detect_types=sqlite3.PARSE_DECLTYPES)
+            connect = sqlite3.connect(
+                ":memory:", detect_types=sqlite3.PARSE_DECLTYPES)
+            connect.text_factory = str
             cursor = connect.cursor()
 
             record = (                
@@ -295,6 +306,7 @@ if __name__ == "__main__":
             dtype.DATETIME.to_sql_param(record[5]),
             dtype.PICKLETYPE.to_sql_param([1, 2, 3]),
             )
+            
             cursor.execute(create_table_sql)
             
             # 插入测试数据
@@ -323,7 +335,8 @@ if __name__ == "__main__":
             dtype.DATETIME.to_sql_param(record[5]),
             dtype.PICKLETYPE.to_sql_param([1, 2, 3]),
             )
-
+            
+            # 该条无法再Python2中通过测试, 原因在本方法的docstring中说明了
             self.assertTupleEqual(cursor.execute(select_sql).fetchone(), record)
             
             # 测试是否能从metadata中的DEFAULT值的字符串形式获得原始的default值

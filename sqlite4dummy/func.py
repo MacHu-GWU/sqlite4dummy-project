@@ -14,9 +14,20 @@ class, method, func, exception
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
-from sqlite4dummy.dtype import dtype
-from sqlite4dummy.schema import Column
-from sqlite4dummy.sql import SQL_Param
+try:
+    from sqlite4dummy.dtype import dtype
+except ImportError:
+    from .dtype import dtype
+
+try:
+    from sqlite4dummy.schema import Column
+except ImportError:
+    from .schema import Column
+    
+try:
+    from sqlite4dummy.sql import SQL_Param
+except ImportError:
+    from .sql import SQL_Param
 
 class SqlFunction():
     """

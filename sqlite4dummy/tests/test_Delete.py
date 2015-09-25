@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-本测试模块用于测试与Delete有关的功能
+本测试模块用于测试与 :class:`sqlite4dummy.schema.Delete` 有关的功能
 
 
 class, method, func, exception
@@ -48,7 +48,8 @@ class DeleteUnittest(unittest.TestCase):
         # delete 300 records (_id from 701 to 1000)
         self.engine.execute(self.table.delete().\
                             where(self.table.c._id >= 701).sql)
-
+        
+        # see if we still got 700 results
         self.assertEqual(
             self.engine.execute(
                 "SELECT COUNT(*) FROM (SELECT * FROM %s)" % self.table).\

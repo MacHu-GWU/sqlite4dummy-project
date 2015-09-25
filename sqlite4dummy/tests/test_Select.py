@@ -2,12 +2,14 @@
 # -*- coding: utf-8 -*-
 
 """
-本测试模块用于测试与Select有关的功能
+本测试模块用于测试与 :class:`sqlite4dummy.schema.Select` 有关的功能。而实际使用
+Select对象从数据库中查询数据的测试, 在 :mod:`sqlite4dummy.engine` 模块中。
 
 
 class, method, func, exception
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
+
 from __future__ import print_function, unicode_literals
 from sqlite4dummy import *
 from datetime import datetime, date
@@ -219,12 +221,12 @@ class SelectUnittest(unittest.TestCase):
 
 class SelectPerformanceUnittest(unittest.TestCase):
     """
-    
+     
     **中文文档**
-    
+     
     测试分别在返回record, row以及结果中 有/无 pickletype的情况下, sqlite4dummy
     的性能是否高于sqlalchemy。
-    
+     
     1. record + has pickle type, 两者不相上下
     2. record + no pickle type, sqlite4dummy明显胜出, 用时是另一个的1/2
     3. row + has pickle type, sqlalchemy胜出, 用时是另一个的2/3
@@ -242,7 +244,7 @@ class SelectPerformanceUnittest(unittest.TestCase):
             )
         self.engine = Sqlite3Engine(":memory:")
         self.metadata.create_all(self.engine)
-        
+         
         self.sa_metadata = sqlalchemy.MetaData()
         self.sa_has_pk = sqlalchemy.Table("has_pk", self.sa_metadata,
             sqlalchemy.Column("_id", sqlalchemy.Integer, primary_key=True),
@@ -254,24 +256,24 @@ class SelectPerformanceUnittest(unittest.TestCase):
             )
         self.sa_engine = sqlalchemy.create_engine("sqlite://", echo=False)
         self.sa_metadata.create_all(self.sa_engine)
-        
+         
         data_has_pk = [{"_id": i, "_list": [1, 2, 3]} for i in range(1000)]
         data_no_pk = [{"_id": i, "_text": "Hello World"} for i in range(1000)]
-        
+         
         ins = self.has_pk.insert()
         self.engine.insert_many_row(ins, 
                                     [Row.from_dict(i) for i in data_has_pk])
-        
+         
         ins = self.no_pk.insert()
         self.engine.insert_many_row(ins, 
                                     [Row.from_dict(i) for i in data_no_pk])
-        
+         
         ins = self.sa_has_pk.insert()
         self.sa_engine.execute(ins, data_has_pk)
-        
+         
         ins = self.sa_no_pk.insert()
         self.sa_engine.execute(ins, data_no_pk)
-        
+         
     def test_select_record_has_pk(self):
         print("\nSelect record HAS pickle type")
         st = time.clock()
@@ -280,7 +282,7 @@ class SelectPerformanceUnittest(unittest.TestCase):
         print("sqlite4dummy elapse %.6f seconds." % (time.clock() - st))
         print("%s item returns." % 
               len(list(self.engine.execute("SELECT * FROM has_pk"))))
-        
+         
         st = time.clock()
         for record in self.sa_engine.execute(sqlalchemy.sql.select([
                                                             self.sa_has_pk])):
@@ -288,7 +290,7 @@ class SelectPerformanceUnittest(unittest.TestCase):
         print("sqlalchemy elapse %.6f seconds." % (time.clock() - st))
         print("%s item returns." %
               len(list(self.engine.execute("SELECT * FROM has_pk"))))
-        
+         
     def test_select_record_no_pk(self):
         print("\nSelect record NO pickle type")
         st = time.clock()
@@ -297,7 +299,7 @@ class SelectPerformanceUnittest(unittest.TestCase):
         print("sqlite4dummy elapse %.6f seconds." % (time.clock() - st))
         print("%s item returns." % 
               len(list(self.engine.execute("SELECT * FROM no_pk"))))
-         
+          
         st = time.clock()
         for record in self.sa_engine.execute(sqlalchemy.sql.select([
                                                             self.sa_no_pk])):
@@ -305,7 +307,7 @@ class SelectPerformanceUnittest(unittest.TestCase):
         print("sqlalchemy elapse %.6f seconds." % (time.clock() - st))
         print("%s item returns." %
               len(list(self.engine.execute("SELECT * FROM no_pk"))))
- 
+  
     def test_select_row_has_pk(self):
         print("\nSelect row HAS pickle type")
         st = time.clock()
@@ -314,7 +316,7 @@ class SelectPerformanceUnittest(unittest.TestCase):
         print("sqlite4dummy elapse %.6f seconds." % (time.clock() - st))
         print("%s item returns." % 
               len(list(self.engine.execute("SELECT * FROM has_pk"))))
-         
+          
         st = time.clock()
         for row in self.sa_engine.execute(sqlalchemy.sql.select([
                                                             self.sa_has_pk])):
@@ -322,7 +324,7 @@ class SelectPerformanceUnittest(unittest.TestCase):
         print("sqlalchemy elapse %.6f seconds." % (time.clock() - st))
         print("%s item returns." %
               len(list(self.engine.execute("SELECT * FROM has_pk"))))
- 
+  
     def test_select_row_no_pk(self):
         print("\nSelect row NO pickle type")
         st = time.clock()
@@ -331,7 +333,7 @@ class SelectPerformanceUnittest(unittest.TestCase):
         print("sqlite4dummy elapse %.6f seconds." % (time.clock() - st))
         print("%s item returns." % 
               len(list(self.engine.execute("SELECT * FROM no_pk"))))
-         
+          
         st = time.clock()
         for row in self.sa_engine.execute(sqlalchemy.sql.select([
                                                             self.sa_no_pk])):

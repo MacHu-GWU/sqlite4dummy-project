@@ -20,6 +20,11 @@ class, method, func, exception
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
+try:
+    from sqlite4dummy.pycompatible import _str_type
+except:
+    from .pycompatible import _str_type
+
 class SQL_Param():
     """SQL_Param represent a Where clause parameter in Select statement.
     
@@ -69,21 +74,30 @@ class SQL_Param():
         self.func_name = func_name
         self.sql_name = sql_name
         self.dtype = dtype
-        
+
+_sql_value_error_message = ("Input has to be list of sqlite4dummy.sql.SQL_Param "
+                            "object. Your is {0}")
+
 def and_(*clauses):
     """AND join list of where clause criterions
     """
-    return SQL_Param("(%s)" % " AND ".join([i.param for i in clauses]))
+    try:
+        return SQL_Param("(%s)" % " AND ".join([i.param for i in clauses]))
+    except AttributeError:
+        raise ValueError(_sql_value_error_message.format(repr(clauses)))
 
 def or_(*clauses):
     """OR join list of where clause criterions
     """
-    return SQL_Param("(%s)" % " OR ".join([i.param for i in clauses]))
-
+    try:
+        return SQL_Param("(%s)" % " OR ".join([i.param for i in clauses]))
+    except AttributeError:
+        raise ValueError(_sql_value_error_message.format(repr(clauses)))
+    
 def asc(column):
     """sort results by column_name in ascending order
     """
-    if isinstance(column, str):
+    if isinstance(column, _str_type):
         return SQL_Param("%s ASC" % column, sql_name="ASC")
     else:
         return SQL_Param("%s ASC" % column.full_name,
@@ -94,7 +108,7 @@ def asc(column):
 def desc(column):
     """sort results by column_name in descending order
     """
-    if isinstance(column, str):
+    if isinstance(column, _str_type):
         return SQL_Param("%s DESC" % column, sql_name="DESC")
     else:
         return SQL_Param("%s DESC" % column.full_name,
@@ -102,3 +116,20 @@ def desc(column):
                           table_name=column.table_name,
                           sql_name="DESC")
         
+if __name__ == "__main__":
+    import unittest
+    
+    class SQLUnittest(unittest.TestCase):
+        def test_and(self):
+            self.assertRaises(ValueError, and_, "test")
+            self.assertEqual(
+                and_(SQL_Param("col1 >= 0"), SQL_Param("col2 <= 1")).param,
+                "(col1 >= 0 AND col2 <= 1)")
+                
+        def test_or(self):
+            self.assertRaises(ValueError, or_, "test")
+            self.assertEqual(
+                or_(SQL_Param("col1 >= 0"), SQL_Param("col2 <= 1")).param,
+                "(col1 >= 0 OR col2 <= 1)")
+            
+    unittest.main()

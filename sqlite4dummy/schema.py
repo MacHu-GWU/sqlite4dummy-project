@@ -37,19 +37,38 @@ class, method, func, exception
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
-from collections import OrderedDict, namedtuple
-from sqlite4dummy.validate import validator
-from sqlite4dummy.dtype import dtype
-from sqlite4dummy.row import Row
-from sqlite4dummy.sql import SQL_Param, and_, or_, asc, desc
-import sqlite4dummy.statement as statement
-import sqlite3
+try:
+    from sqlite4dummy.validate import validator
+except ImportError:
+    from .validate import validator
+    
+try:
+    from sqlite4dummy.dtype import dtype
+except ImportError:
+    from .dtype import dtype
+    
+try:
+    from sqlite4dummy.sql import SQL_Param, asc
+except ImportError:
+    from .sql import SQL_Param, asc
+    
+try:
+    import sqlite4dummy.statement as statement
+except ImportError:
+    from .statement import statement
+
+try:
+    from sqlite4dummy.pycompatible import _str_type
+except:
+    from .pycompatible import _str_type
+
+from collections import OrderedDict
 
 ###############################################################################
 #                               Insert Class                                  #
 ###############################################################################
 
-class Insert():
+class Insert(object):
     """An Insert statement objective oriented constructor.
     
     Insert object are constructed from a table. You can call 
@@ -122,7 +141,7 @@ class Insert():
 class SelectObjectError(Exception):
     pass
         
-class Select():
+class Select(object):
     """A Select statement objective oriented constructor.
 
     To create a Select object, you have to name a list of Column object has to 
@@ -222,7 +241,7 @@ class Select():
         for i in argv:
             if isinstance(i, Column):
                 priority.append(asc(i).param)
-            elif isinstance(i, str):
+            elif isinstance(i, _str_type):
                 priority.append("%s ASC" % i)
             else:
                 priority.append(i.param)
@@ -277,7 +296,7 @@ class Select():
 class UpdateObjectError(Exception):
     pass
 
-class Update():
+class Update(object):
     """A Update statement objective oriented constructor.
     
     An update construct with 
@@ -345,7 +364,7 @@ class Update():
                     res.append("%s = %s" % (
                         column_name, value.param)) # 直接使用
                 except: # value是一个值, 处理绝对更新
-                    if isinstance(value, str):
+                    if isinstance(value, _str_type):
                         res.append("%s = '%s'" % ( # 处理字符串的特殊字符
                             column_name, value.\
                                             replace("'", "''").\
@@ -378,7 +397,7 @@ class Update():
 #                               Delete Class                                  #
 ###############################################################################
 
-class Delete():
+class Delete(object):
     """A Delete statement objective oriented constructor.
     
     The :meth:`Delete.where` method specifies which record or records that should 
@@ -421,7 +440,7 @@ class Delete():
 #                               Column Class                                  #
 ###############################################################################
 
-class Column():
+class Column(object):
     """Represent a Column in a :class:`Table`.
     
     Construct a Column object::
@@ -651,8 +670,17 @@ class Column():
             return SQL_Param("%s * %s" % (self.full_name, 
                                            self.to_sql_param(other)) )
     
-    def __truediv__(self, other):
+    def __div__(self, other):
         """Column / other
+        """
+        if isinstance(other, Column):
+            return SQL_Param("%s / %s" % (self.full_name, other.full_name) )
+        else:
+            return SQL_Param("%s / %s" % (self.full_name, 
+                                           self.to_sql_param(other)) )
+            
+    def __truediv__(self, other):
+        """Column / other, for python2,3 compatible
         """
         if isinstance(other, Column):
             return SQL_Param("%s / %s" % (self.full_name, other.full_name) )
@@ -677,7 +705,7 @@ class Column():
 class DuplicateColumnError(Exception):
     pass
 
-class ColumnCollection():
+class ColumnCollection(object):
     def __init__(self, *args):
         for column in args:
             if not isinstance(column, Column):
@@ -688,7 +716,7 @@ class ColumnCollection():
         if len({column.column_name for column in args}) != len(args):
             raise DuplicateColumnError("Duplicate column name found!")
 
-class Table():
+class Table(object):
     """Represent a table in a database.
 
     Define a Table::
@@ -853,7 +881,7 @@ class Table():
 class IndexObjectError(Exception):
     pass
 
-class Index():
+class Index(object):
     """Represent a index of a :class:`Table`.
 
     :param index_name: the table name, alpha, digit and understore only.
@@ -885,13 +913,13 @@ class Index():
     是包含了所属的table对象的信息的。当Index只由字符串生成时, 则要额外指定可
     选参数``table_name``。在其他时候, 我们并不需要显式地指定表名。
     """
-    def __init__(self, index_name, metadata, *args, 
-                 table_name=None, unique=False):
+    def __init__(self, index_name, metadata, table_name=None, unique=False, 
+                 *args):
         validator.exam_table_name(index_name)
         
         self.index_name = index_name
         self.metadata = metadata
-        self.table_name = table_name
+        self.table_name = str(table_name)
         self.unique = unique
         self.params = list()
 
@@ -899,17 +927,16 @@ class Index():
             self.CREATE_clause = "CREATE UNIQUE INDEX %s" % self.index_name
         else:
             self.CREATE_clause = "CREATE INDEX %s" % self.index_name
-            
+        
         for i in args:
             if isinstance(i, Column): # column
                 self.params.append("%s ASC" % i.column_name)
-            elif isinstance(i, str): # string
+            elif isinstance(i, _str_type): # string
                 self.params.append(i)
             else: # _SQL_PARAM
                 self.params.append("%s %s" % (i.column_name, i.sql_name))
                 
             try: # see if table_name is constant in all argument
-                self.ON_TABLE_clause = "ON %s" % i.table_name
                 if self.table_name:
                     if self.table_name != i.table_name:
                         raise IndexObjectError("Table name are not unique!")
@@ -917,6 +944,8 @@ class Index():
                     self.table_name = i.table_name
             except:
                 pass
+        
+        self.ON_TABLE_clause = "ON %s" % self.table_name
         
         self.COLUMN_clause = "\t" + ",\n\t".join(self.params)
         
@@ -941,7 +970,7 @@ class Index():
         对象。
         """
         template = ("Index('%s', MetaData(), \n\t%s\n\t"
-                    "unique=%s,\n\ttable_name=%s,\n\t)")
+                    "table_name=%s,\n\tunique=%s,\n\t)")
         return template % (
             self.index_name, 
             ",\n\t".join([repr(i) for i in self.params]),
@@ -993,7 +1022,7 @@ class DuplicateTableError(Exception):
 class DuplicateIndexError(Exception):
     pass
 
-class MetaData():
+class MetaData(object):
     """A schema information container holds all Table objects in a database and
     their columns' schema definition and constructs.
     
@@ -1016,9 +1045,10 @@ class MetaData():
         self.t = OrderedDict()
         self.i = OrderedDict()
         if bind:
-            if isinstance(bind, Sqlite3Engine):
+            try:
                 self.reflect(bind)
-            else:
+            except Exception as e:
+                print(e)
                 raise Exception("You cannot bind metadata to '%s'!" % repr(bind))
         else:
             self.bind = bind
@@ -1124,6 +1154,12 @@ class MetaData():
                 
     def reflect(self, engine, pickletype_columns=list()):
         """Read table, column, index metadata from database schema information.
+        
+        :param engine: Bind to :class:`~sqlite4dummy.engine.Sqlite3Engine`
+        
+        :param pickletype_columns: pickletype columns' full name list. e.g. 
+          [table_name1.column_name1, table_name2.column_name2, ...]
+        
         """
         self.bind = engine
 
@@ -1157,7 +1193,7 @@ class MetaData():
                                 default=default)
                 columns.append(column)
             
-            table = Table(table_name, self, *columns)
+            _ = Table(table_name, self, *columns)
 
         # extract index schema
         for record in engine.execute(
@@ -1169,6 +1205,5 @@ class MetaData():
             params = [i.strip() for i in params]
 
             unique = "CREATE UNIQUE INDEX" in sql
-            index = Index(index_name, self, 
-                        *params,
-                        table_name=table_name, unique=unique)
+            _ = Index(index_name, self, table_name, unique, *params)
+            

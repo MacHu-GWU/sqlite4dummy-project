@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-本测试模块用于测试与Update有关的功能。
+本测试模块用于测试与 :class:`sqlite4dummy.schema.Update` 有关的功能。
 
 **关于Insert or update和Upsert的一些探讨**
 
@@ -89,6 +89,8 @@ class UpdateSqlUnittest(unittest.TestCase):
                    _text=r"""a\b"x"y'z'b/c""").\
             where(t.c._id == 1, t.c._text == "abc")
         self.engine.update(upd)
+        
+        # 检查更新后的值是否正确
         row = list(self.engine.select_row(Select(t.all)))[0]
         self.assertEqual(row._int, 200)
         self.assertEqual(row._real, 103.14)
@@ -108,6 +110,8 @@ class UpdateSqlUnittest(unittest.TestCase):
              b"8e01ad49", [1, 2, 3]),
             ]
         self.engine.insdate_many_record(ins, records)
+        
+        # 检查更新后的值是否正确
         rows = list(self.engine.select_row(Select(t.all)))
         self.assertEqual(rows[0]._int, 200)
         self.assertEqual(rows[0]._real, 103.14)
@@ -146,6 +150,7 @@ class UpdateSqlUnittest(unittest.TestCase):
             ]
         self.engine.insdate_many_row(ins, rows)
         
+        # 检查更新后的值是否正确
         rows = list(self.engine.select_row(Select(t.all)))
         self.assertEqual(rows[0]._int, 200)
         self.assertEqual(rows[0]._real, 103.14)

@@ -8,14 +8,12 @@ class, method, func, exception
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
-import itertools
-import sys
+from .pycompatible import is_py3
 
-is_py2 = (sys.version_info[0] == 2)
-if is_py2:
-    from itertools import ifilterfalse as filterfalse, izip_longest as zip_longest
-else: # in python3
-    from itertools import filterfalse, zip_longest
+if is_py3:
+    from itertools import zip_longest
+else:
+    from itertools import izip_longest as zip_longest
     
 def grouper(iterable, n, fillvalue=None):
     """Collect data into fixed-length chunks or blocks.

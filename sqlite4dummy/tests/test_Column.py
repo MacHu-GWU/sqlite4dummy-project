@@ -19,6 +19,8 @@ class ColumnUnittest(unittest.TestCase):
     Column的方法的单元测试。
     """
     def test_str_and_repr(self):
+        """测试Column的 ``__str__`` 和 ``__repr__`` 方法。
+        """
         column = Column("_id", dtype.INTEGER,
                         nullable=False, default=None, primary_key=True)
         self.assertEqual(str(column), "_id")
@@ -37,8 +39,9 @@ class ColumnUnittest(unittest.TestCase):
 
         column = Column("_byte", dtype.BLOB, default=b"8e01ad49")
         self.assertEqual(str(column), "_byte")
-        self.assertEqual(repr(column), 
-            "Column('_byte', dtype.BLOB, nullable=True, default=b'8e01ad49', primary_key=False)")
+        self.assertIn(repr(column), 
+            ["Column('_byte', dtype.BLOB, nullable=True, default=b'8e01ad49', primary_key=False)",
+             "Column('_byte', dtype.BLOB, nullable=True, default='8e01ad49', primary_key=False)",])
         
         column = Column("_date", dtype.DATE, default=date(2000, 1, 1))
         self.assertEqual(str(column), "_date")
@@ -56,6 +59,9 @@ class ColumnUnittest(unittest.TestCase):
             "Column('_pickle', dtype.PICKLETYPE, nullable=True, default=[1, 2, 3], primary_key=False)")
         
     def test_comparison_operator(self):
+        """测试比较运算符是否能正确产生 :class:`~sqlite4dummy.sql.SQL_Param` 对象,
+        并且确保对应的SQL字符串正确。
+        """
         c = Column("other_column", dtype.TEXT)
         
         # integer type
@@ -115,8 +121,10 @@ class ColumnUnittest(unittest.TestCase):
         column = Column("_blob", dtype.BLOB)
         t = Table("test", MetaData(), c, column)
         
-        self.assertEqual((column == b"8e01ad49").param, 
-                         "test._blob = X'3865303161643439'")
+        self.assertIn(
+            (column == b"8e01ad49").param, 
+            ["test._blob = X'3865303161643439'", ],
+            )
         self.assertEqual((column != b"8e01ad49").param, 
                          "test._blob != X'3865303161643439'")
         
@@ -124,10 +132,16 @@ class ColumnUnittest(unittest.TestCase):
         column = Column("_pickle", dtype.PICKLETYPE)
         t = Table("test", MetaData(), c, column)
         
-        self.assertEqual((column == [1, 2, 3]).param, 
-                         "test._pickle = X'80035d7100284b014b024b03652e'")
-        self.assertEqual((column != [1, 2, 3]).param, 
-                         "test._pickle != X'80035d7100284b014b024b03652e'")
+        self.assertIn(
+            (column == [1, 2, 3]).param, 
+            ["test._pickle = X'80035d7100284b014b024b03652e'",
+             "test._pickle = X'80025d7100284b014b024b03652e'"],
+            )
+        self.assertIn(
+            (column != [1, 2, 3]).param, 
+            ["test._pickle != X'80035d7100284b014b024b03652e'",
+             "test._pickle != X'80025d7100284b014b024b03652e'"],
+            )
         
         # None type
         self.assertEqual((column == None).param,

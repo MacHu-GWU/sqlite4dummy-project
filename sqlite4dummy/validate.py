@@ -7,6 +7,8 @@ the :class:`Validator` class performs basic check before initializing a
 :class:`Column <sqlite4dummy.schema.Column>`, :class:`Table <sqlite4dummy.schema.Table>`,
 :class:`sqlite4dummy.schema.Index` 
 
+Delete the Non-Captial letter restriction in version 0.0.5
+
 
 class, method, func, exception
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,10 +47,10 @@ class Validator():
         if name[0].isdigit():
             raise ColumnNameError("Column name cannot start with number.")
         
-        if name != name.lower():
-            raise ColumnNameError("Warning: although column name is not "
-                            "case sensitive in sqlite, but we recommend all "
-                            "lower case column name.")
+#         if name != name.lower():
+#             raise ColumnNameError("Warning: although column name is not "
+#                             "case sensitive in sqlite, but we recommend all "
+#                             "lower case column name.")
             
     def exam_table_name(self, name):
         """Exam table name to avoid sql injection attack.
@@ -68,10 +70,10 @@ class Validator():
         if name[0].isdigit():
             raise TableNameError("Table name cannot start with number.")
         
-        if name != name.lower():
-            raise TableNameError("Warning: although table name is not "
-                           "case sensitive in sqlite, but we recommend all "
-                           "lower case table name.")
+#         if name != name.lower():
+#             raise TableNameError("Warning: although table name is not "
+#                            "case sensitive in sqlite, but we recommend all "
+#                            "lower case table name.")
         
     def exam_index_name(self, name):
         """Exam index name to avoid sql injection attack.
@@ -91,10 +93,10 @@ class Validator():
         if name[0].isdigit():
             raise IndexNameError("Index name cannot start with number.")
         
-        if name != name.lower():
-            raise IndexNameError("Warning: although index name is not "
-                           "case sensitive in sqlite, but we recommend all "
-                           "lower case index name.")
+#         if name != name.lower():
+#             raise IndexNameError("Warning: although index name is not "
+#                            "case sensitive in sqlite, but we recommend all "
+#                            "lower case index name.")
                 
 validator = Validator()
 
@@ -109,9 +111,9 @@ if __name__ == "__main__":
             self.assertRaises(ColumnNameError,
                               validator.exam_column_name,
                               "007_profile")
-            self.assertRaises(ColumnNameError,
-                              validator.exam_column_name,
-                              "BigColumn")
+#             self.assertRaises(ColumnNameError,
+#                               validator.exam_column_name,
+#                               "BigColumn")
             validator.exam_column_name("_id")
 
         def test_exam_table_name(self):
@@ -121,9 +123,9 @@ if __name__ == "__main__":
             self.assertRaises(TableNameError,
                               validator.exam_table_name,
                               "007_profile")
-            self.assertRaises(TableNameError,
-                              validator.exam_table_name,
-                              "BigTable")
+#             self.assertRaises(TableNameError,
+#                               validator.exam_table_name,
+#                               "BigTable")
             validator.exam_table_name("_product")
 
         def test_exam_index_name(self):
@@ -133,9 +135,9 @@ if __name__ == "__main__":
             self.assertRaises(IndexNameError,
                               validator.exam_index_name,
                               "007_profile")
-            self.assertRaises(IndexNameError,
-                              validator.exam_index_name,
-                              "BigTable")
+#             self.assertRaises(IndexNameError,
+#                               validator.exam_index_name,
+#                               "BigTable")
             validator.exam_index_name("_myindex")
                  
     unittest.main()

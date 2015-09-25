@@ -49,9 +49,21 @@ class, method, func, exception
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
-from sqlite4dummy.row import Row
-from sqlite4dummy.iterate import grouper_list
-from sqlite4dummy.schema import Select
+try:
+    from sqlite4dummy.row import Row
+except ImportError:
+    from .row import Row
+    
+try:
+    from sqlite4dummy.iterate import grouper_list
+except ImportError:
+    from .iterate import grouper_list
+    
+try:
+    from sqlite4dummy.schema import Select
+except ImportError:
+    from .schema import Select
+
 from collections import OrderedDict
 import sqlite3
 import pickle
@@ -62,12 +74,10 @@ try:
 except ImportError:
     print("pandas not found, the select_df feature is not able to work.")
 
-
-is_py2 = (sys.version_info[0] == 2)
-if is_py2:
-    pk_protocol = 2
-else:
+if sys.version_info[0] == 3:
     pk_protocol = 3
+else:
+    pk_protocol = 2
 
 class PickleTypeConverter():
     """High performance PickleType data converter Class.
@@ -220,7 +230,6 @@ class PickleTypeConverter():
         :class:`~sqlite4dummy.row.Row`。
         """
         if len(self.table.pickletype_columns):
-            column_names = list()
             new_record = list()
             for column, value in zip(self.table.all, record):
                 if value:
@@ -292,8 +301,9 @@ class Sqlite3Engine():
     """
     def __init__(self, dbname, autocommit=True):
         self.dbname = dbname
-        self.connect = sqlite3.connect(dbname, 
-                                       detect_types=sqlite3.PARSE_DECLTYPES)
+        self.connect = sqlite3.connect(
+            dbname, detect_types=sqlite3.PARSE_DECLTYPES)
+        self.connect.text_factory = str
         self.cursor = self.connect.cursor()
         
         self.set_autocommit(autocommit)
@@ -306,7 +316,7 @@ class Sqlite3Engine():
         return "Sqlite3Engine(dbname=r'%s', autocommit=%s)" % (
             self.dbname, self.is_autocommit)
     
-    def execute(self, *args, **kwarg):
+    def execute(self, sql, *args):
         """Execute SQL command.
         
         **中文文档**
@@ -315,9 +325,9 @@ class Sqlite3Engine():
         `Cursor.execute <https://docs.python.org/3.3/library/sqlite3.html#sqlite3.Cursor.execute>`_
         方法。
         """
-        return self.cursor.execute(*args, **kwarg)
+        return self.cursor.execute(sql, *args)
 
-    def executemany(self, *args, **kwarg):
+    def executemany(self, sql, *args):
         """Call generic sqlite3 API bulk insert method.
         
         **中文文档**
@@ -326,7 +336,7 @@ class Sqlite3Engine():
         `Cursor.executemany <https://docs.python.org/3.3/library/sqlite3.html#sqlite3.Cursor.executemany>`_
         方法。
         """
-        return self.cursor.executemany(*args, **kwarg)
+        return self.cursor.executemany(sql, *args)
     
     def commit(self):
         """Method for manually commit operation.
@@ -422,6 +432,7 @@ class Sqlite3Engine():
         插入单条tuple或list数据。
         """
         ins_obj.sql_from_record()
+        print(ins_obj.sql, self.convert_record(ins_obj.table, record))
         self.cursor.execute(ins_obj.sql, self.convert_record(
                                             ins_obj.table, record))
         self._commit()
@@ -887,8 +898,7 @@ class Sqlite3Engine():
         return indexname_list
     
 if __name__ == "__main__":
-    from sqlite4dummy.dtype import dtype
-    from sqlite4dummy.schema import Column, Table, MetaData
+    from sqlite4dummy import *
     from sqlite4dummy.tests.test_database_setting import *
     import unittest
     
@@ -904,7 +914,7 @@ if __name__ == "__main__":
                 Column("_value", dtype.INTEGER),
                 )
             self.engine = Sqlite3Engine(":memory:")
-
+ 
         def test_single_item_converter(self):
             """使用engine自带的, 用于处理单次record或row转换的``convert_record()``
             和``convert_row``方法, 根据Table中每列关于PickleType的定义, 将数据中
@@ -912,14 +922,14 @@ if __name__ == "__main__":
             """
             self.assertEqual(self.engine.convert_record(self.has_pk, 
                                                         ("F-001", [1, 2, 3])),
-                             ['F-001', b'\x80\x03]q\x00(K\x01K\x02K\x03e.'])
+                             ['F-001', pickle.dumps([1, 2, 3], protocol=pk_protocol)])
             self.assertEqual(self.engine.convert_row(self.has_pk,
                                                      Row(("_id",), ("F-001",))),
                              ["F-001",])
             self.assertEqual(self.engine.convert_row(self.has_pk,
                              Row(("_id", "_list"), ("F-001", [1, 2, 3]))),
-                             ["F-001", b"\x80\x03]q\x00(K\x01K\x02K\x03e."])
-            
+                             ["F-001", pickle.dumps([1, 2, 3], protocol=pk_protocol)])
+             
             self.assertEqual(self.engine.convert_record(self.no_pk, 
                                                         ("F-001", 100)),
                              ('F-001', 100))
@@ -929,12 +939,14 @@ if __name__ == "__main__":
             self.assertEqual(self.engine.convert_row(self.no_pk,
                              Row(("_id", "_value"), ("F-001", 100))),
                              ("F-001", 100))
-            
+             
         def test_compiled_item_converter(self):
+            """测试根据Table编译converter的过程是否成功。
+            """
             conv_has_pk = PickleTypeConverter(self.has_pk)
             conv_no_pk = PickleTypeConverter(self.no_pk)
             pass
-        
+         
     class EngineVanillaMethodUnittest(unittest.TestCase):
         """测试Sqlite3Engine的魔术方法。
         """
@@ -944,25 +956,25 @@ if __name__ == "__main__":
                 self.table,
                 self.engine
             ) = initial_all_dtype_database(needdata=True)
-        
+         
         def test_howmany(self):
             self.assertEqual(self.engine.howmany(self.table), total)
-             
+              
         def test_tabulate(self):
             self.assertEqual(len(self.engine.tabulate(self.table)), total)
-             
+                
         def test_dictize(self):
             self.assertEqual(len(self.engine.dictize(self.table)), 8)
             self.assertEqual(len(self.engine.dictize(self.table)["_id"]), total)
-             
+                
         def test_prt_all(self):
             self.engine.prt_all(self.table)
             print(self.engine.tabulate(self.table))
             print(self.engine.dictize(self.table))
-        
+           
         def test_remove_all(self):
             self.engine.remove_all("test")
-            
+               
         def test_property_method(self):
             self.assertEqual(self.engine.all_tablename, ["test"])
             self.assertEqual(self.engine.all_indexname, [])

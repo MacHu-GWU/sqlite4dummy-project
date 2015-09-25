@@ -95,14 +95,17 @@ if __name__ == "__main__":
                 Column("memo", dtype.TEXT, default="This guy is lazy, no memo."),
                 )
             
-            create_table = CreateTable(employee)
-            print(create_table.sql)
+            create_table = CreateTable(employee) 
+            sql = create_table.sql # 生成sql
+            print(sql)
+            
             connect = sqlite3.connect(":memory:", 
                                       detect_types=sqlite3.PARSE_DECLTYPES)
             cursor = connect.cursor()
-            cursor.execute(create_table.sql)
+            cursor.execute(sql)
             self.assertEqual(
                 len(cursor.execute("PRAGMA table_info(employee)").fetchall()),
                 6) # 刚创建的表一共有6列
+            
             
     unittest.main()

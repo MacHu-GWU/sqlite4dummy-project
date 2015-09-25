@@ -178,7 +178,7 @@ class, method, func, exception
 from collections import OrderedDict
 import copy
 
-class Row():
+class Row(object):
     """An abstract class of single cursor row.
     
     Basically, it behave like an ``OrderedDict``. You can visit column's value::
@@ -343,9 +343,9 @@ if __name__ == "__main__":
             
         def test_dict_view(self):
             self.assertDictEqual(self.row1.data, 
-                                 OrderedDict([('_id', 'a'), ('value', 1)]))
+                                 OrderedDict([("_id", "a"), ("value", 1)]))
             self.assertDictEqual(self.row1.to_dict(), 
-                                 OrderedDict([('_id', 'a'), ('value', 1)]))
+                                 OrderedDict([("_id", "a"), ("value", 1)]))
             
         def test_get_column_value(self):
             self.assertEqual(self.row1._id, "a")

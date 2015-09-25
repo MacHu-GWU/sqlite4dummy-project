@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-本测试模块用于测试与:class:`sqlite4dummy.schema.Index`有关的方法
+本测试模块用于测试与 :class:`sqlite4dummy.schema.MetaData` 有关的方法
 
 
 class, method, func, exception
@@ -39,12 +39,11 @@ class MetaDataUnittest(unittest.TestCase):
             )
         self.metadata.create_all(self.engine)
         
-        self.index = Index("test_index", self.metadata,
+        self.index = Index("test_index", self.metadata, self.test, True, 
             self.test.c._int,
             self.test.c._float.desc(),
             self.test.c._date,
             desc(self.test.c._datetime),
-            unique=True,
             )
         self.index.create(self.engine)
         
@@ -100,10 +99,10 @@ class MetaDataUnittest(unittest.TestCase):
         """
         second_metadata = MetaData()
         second_metadata.reflect(self.engine, 
-                                pickletype_columns=[
-                                    "test._pickle_with_default",
-                                    "test._pickle",
-                                    ])
+                pickletype_columns=[
+                "test._pickle_with_default",
+                "test._pickle",
+            ])
         self.assertEqual(second_metadata.get_table("test").\
                          c._int_with_default.default, 1)
         self.assertEqual(second_metadata.get_table("test").\

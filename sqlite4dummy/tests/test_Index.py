@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-本测试模块用于测试与:class:`sqlite4dummy.schema.Index`有关的方法
+本测试模块用于测试与 :class:`sqlite4dummy.schema.Index` 有关的方法
 
 
 class, method, func, exception
@@ -38,7 +38,7 @@ class IndexUnittest(unittest.TestCase):
         """测试Index对象能否被成功初始化。
         """
         product = self.product
-        index = Index("name_index", self.metadata,
+        index = Index("name_index", self.metadata, product, True,
                       product.c.product_name, product.c.price.desc())
         self.assertEqual(str(index), "name_index")
         print(repr(index))
@@ -48,22 +48,29 @@ class IndexUnittest(unittest.TestCase):
         """
         product = self.product
         
+        # 看看创建前总共有多少个Index, 应该是0个
         res = self.engine.execute("SELECT * FROM sqlite_master "
                                   "WHERE type = 'index';").fetchall()
         self.assertEqual(len(res), 0) # no index
         
-        index = Index("name_index", self.metadata,
+        # 创建一个Index
+        index = Index("name_index", self.metadata, product, True,
                       product.c.product_name, product.c.price.desc())
         index.create(self.engine)
-        
+         
+        # 看看创建后总共有多少个Index, 应该是1个
         res = self.engine.execute("SELECT * FROM sqlite_master "
                                   "WHERE type = 'index';").fetchall()
-
         self.assertEqual(len(res), 1) # has one index
+        
+        # 检查Index的名字和表的名字
         self.assertEqual(res[0][1], "name_index") # read index name
         self.assertEqual(res[0][2], "product") # read index table name
         
+        # 删掉一个Index
         index.drop(self.engine)
+        
+        # 看看删除后总共有多少个Index, 应该是1个
         res = self.engine.execute("SELECT * FROM sqlite_master "
                                   "WHERE type = 'index';").fetchall()
         self.assertEqual(len(res), 0) # has no index
