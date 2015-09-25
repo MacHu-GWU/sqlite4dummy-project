@@ -1,6 +1,6 @@
 pushd "%~dp0"
 cd sqlite4dummy
-python zzz_manual_install.py
+python3 zzz_manual_install.py
 cd ..
-python create_doctree.py
+python3 create_doctree.py
 make html

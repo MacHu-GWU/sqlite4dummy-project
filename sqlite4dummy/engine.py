@@ -15,13 +15,11 @@ For all available methods, go :class:`Sqlite3Engine`.
 
 For example usage, click the link, and read the source code link:
 
-- :mod:`Create table<sqlite4dummy.tests.test_MetaData>`
-
-- :mod:`CREATE (Insert)<sqlite4dummy.tests.test_Insert>`
-- :mod:`READ (Select)<sqlite4dummy.tests.test_Select>`
+- :mod:`Create table <sqlite4dummy.tests.test_MetaData>`
+- :mod:`CREATE (Insert) <sqlite4dummy.tests.test_Insert>`
+- :mod:`READ (Select) <sqlite4dummy.tests.test_Select>`
 - :mod:`Update (Update)<sqlite4dummy.tests.test_Update>`
-- :mod:`Delete (Delete)<sqlite4dummy.tests.test_Delete>`
-
+- :mod:`Delete (Delete) <sqlite4dummy.tests.test_Delete>`
 - :mod:`Index <sqlite4dummy.tests.test_Index>`
 
 
@@ -35,13 +33,11 @@ Chinese Doc (中文文档)
 
 请前往这里查看所有的使用例子(点击source code按钮即可看到例子源代码)。
 
-- :mod:`建立表<sqlite4dummy.tests.test_MetaData>`
-
-- :mod:`增 (Insert)<sqlite4dummy.tests.test_Insert>`
-- :mod:`删 (Delete)<sqlite4dummy.tests.test_Delete>`
-- :mod:`查 (Select)<sqlite4dummy.tests.test_Select>`
-- :mod:`改 (Update)<sqlite4dummy.tests.test_Update>`
-
+- :mod:`建立表 <sqlite4dummy.tests.test_MetaData>`
+- :mod:`增 (Insert) <sqlite4dummy.tests.test_Insert>`
+- :mod:`删 (Delete) <sqlite4dummy.tests.test_Delete>`
+- :mod:`查 (Select) <sqlite4dummy.tests.test_Select>`
+- :mod:`改 (Update) <sqlite4dummy.tests.test_Update>`
 - :mod:`建立索引 <sqlite4dummy.tests.test_Index>`
 
 

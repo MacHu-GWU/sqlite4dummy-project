@@ -15,6 +15,7 @@ subpackage and modules
 	engine <engine>
 	func <func>
 	iterate <iterate>
+	pycompatible <pycompatible>
 	row <row>
 	schema <schema>
 	sql <sql>
