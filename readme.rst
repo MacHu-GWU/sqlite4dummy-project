@@ -10,7 +10,6 @@ Quick links:
 - `Home page <https://github.com/MacHu-GWU/sqlite4dummy-project>`_
 - `Online Documentation <http://sqlite4dummy-project.readthedocs.org/>`_
 - `PyPI download <https://pypi.python.org/pypi/sqlite4dummy>`_
-- `Download offline HTML document <http://readthedocs.org/projects/sqlite4dummy-project/downloads/htmlzip/latest/>`_
 - `Install <install_>`_
 
 
