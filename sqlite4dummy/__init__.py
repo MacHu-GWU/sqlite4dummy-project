@@ -18,6 +18,8 @@ from .func import func
 from .sql import and_, or_, asc, desc
 
 __version__ = "0.0.5"
+__short_description__ = ("A high performance and easy to use sqlite API for "
+                         "Data Scientist.")
 __all__ = [
     "dtype", 
     "Sqlite3Engine", 
