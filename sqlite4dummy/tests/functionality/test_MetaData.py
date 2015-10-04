@@ -10,6 +10,7 @@ class, method, func, exception
 """
 
 from sqlite4dummy import *
+from sqlite4dummy.tests.basetest import BaseUnittest, AdvanceUnittest, DB_FILE
 from datetime import datetime, date
 import unittest
 
@@ -21,25 +22,36 @@ class MetaDataUnittest(unittest.TestCase):
     def setUp(self):
         self.engine = Sqlite3Engine(":memory:", autocommit=False)
         self.metadata = MetaData()
+        
+        self.int_ = 1
+        self.float_ = 3.14
+        self.str_ = r"""\/!@#$%^&*()_+-=~`|[]{}><,.'"?"""
+        self.bytes_ = "abc".encode("utf-8")
+        self.date_ = date(2000, 1, 1)
+        self.datetime_ = datetime(2015, 10, 1, 18, 30, 0, 123)
+        self.pickle_ = [1, 2, 3]
+        
         self.test = Table("test", self.metadata,
-            Column("_string", dtype.TEXT, primary_key=True),
-            Column("_int_with_default", dtype.INTEGER, default=1),
-            Column("_float_with_default", dtype.REAL, default=3.14),
-            Column("_byte_with_default", dtype.BLOB, default=b"8e01ad49"),
-            Column("_date_with_default", dtype.DATE, default=date(2000, 1, 1)),
-            Column("_datetime_with_default", dtype.DATETIME, 
-                   default=datetime(2015, 12, 31, 8, 30, 17, 123)),
-            Column("_pickle_with_default", dtype.PICKLETYPE, default=[1, 2, 3]),
+            Column("_id", dtype.INTEGER, primary_key=True, nullable=False),
+            Column("_int_with_default", dtype.INTEGER, default=self.int_),
+            Column("_float_with_default", dtype.REAL, default=self.float_),
+            Column("_str_with_default", dtype.TEXT, default=self.str_),
+            Column("_bytes_with_default", dtype.BLOB, default=self.bytes_),
+            Column("_date_with_default", dtype.DATE, default=self.date_),
+            Column("_datetime_with_default", dtype.DATETIME, default=self.datetime_),
+            Column("_pickle_with_default", dtype.PICKLETYPE, default=self.pickle_),
+            
             Column("_int", dtype.INTEGER),
             Column("_float", dtype.REAL),
-            Column("_byte", dtype.BLOB),
+            Column("_str", dtype.TEXT),
+            Column("_bytes", dtype.BLOB),
             Column("_date", dtype.DATE),
             Column("_datetime", dtype.DATETIME),
             Column("_pickle", dtype.PICKLETYPE),
             )
         self.metadata.create_all(self.engine)
         
-        self.index = Index("test_index", self.metadata, self.test, True, 
+        self.index = Index("test_index", self.metadata, self.test, True, False,
             self.test.c._int,
             self.test.c._float.desc(),
             self.test.c._date,
@@ -49,7 +61,7 @@ class MetaDataUnittest(unittest.TestCase):
         
         self.assertEqual(
             len(self.engine.execute("PRAGMA table_info(test);").fetchall()),
-            13,
+            15,
             )
         self.assertEqual(
             len(self.engine.execute(
@@ -57,7 +69,10 @@ class MetaDataUnittest(unittest.TestCase):
                 "WHERE type = 'index' AND sql NOT NULL;").fetchall()),
             1,
             )
-
+    
+    def tearDown(self):
+        self.engine.close()
+    
     def test_drop_all(self):
         """测试drop_all是否能drop所有的表。
         """
@@ -104,18 +119,19 @@ class MetaDataUnittest(unittest.TestCase):
                 "test._pickle",
             ])
         self.assertEqual(second_metadata.get_table("test").\
-                         c._int_with_default.default, 1)
+                         c._int_with_default.default, self.int_)
         self.assertEqual(second_metadata.get_table("test").\
-                         c._float_with_default.default, 3.14)
+                         c._float_with_default.default, self.float_)
         self.assertEqual(second_metadata.get_table("test").\
-                         c._byte_with_default.default, b"8e01ad49")
+                         c._str_with_default.default, self.str_)
         self.assertEqual(second_metadata.get_table("test").\
-                         c._date_with_default.default, date(2000, 1, 1))
+                         c._bytes_with_default.default, self.bytes_)
         self.assertEqual(second_metadata.get_table("test").\
-                         c._datetime_with_default.default, 
-                         datetime(2015, 12, 31, 8, 30, 17, 123))
+                         c._date_with_default.default, self.date_)
         self.assertEqual(second_metadata.get_table("test").\
-                         c._pickle_with_default.default, [1, 2, 3])
+                         c._datetime_with_default.default, self.datetime_)
+        self.assertEqual(second_metadata.get_table("test").\
+                         c._pickle_with_default.default, self.pickle_)
         
         self.assertEqual(second_metadata.get_index("test_index").\
                          index_name, "test_index")

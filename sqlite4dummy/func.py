@@ -126,5 +126,17 @@ class SqlFunction():
                               dtype=dtype.TEXT,)
         else:
             raise Exception("func.upper()'s argument has to be Column object.")
+    
+    def round(self, column):
+        """ROUND(column) function.
+        """
+        if isinstance(column, Column):
+            return SQL_Param("ROUND(%s)" % column.column_name,
+                              column_name=column.column_name, 
+                              table_name=column.table_name,
+                              func_name="_round_",
+                              dtype=dtype.TEXT,)
+        else:
+            raise Exception("func.upper()'s argument has to be Column object.")
         
 func = SqlFunction()

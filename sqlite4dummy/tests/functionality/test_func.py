@@ -11,16 +11,18 @@ class, method, func, exception
 
 from __future__ import print_function, unicode_literals
 from sqlite4dummy import *
-from sqlite4dummy.tests.test_database_setting import (
-    random_text, random_date, random_datetime, 
-    initial_all_dtype_database, initial_has_pickle, initial_no_pickle,
-    )
+from sqlite4dummy.tests.basetest import BaseUnittest
 import unittest
 
-class SqlFuncUnittest(unittest.TestCase):
+class SqlFuncUnittest(BaseUnittest):
     """Unittest of :mod:`sqlite4dummy.func`.
     """
     def setUp(self):
+        self.connect_database()
+        self.create_all_type_table(has_data=True)
+        
+        self.metadata = MetaData()
+        
         self.metadata, self.table, self.engine = initial_all_dtype_database(
                                                             needdata=True)
         
@@ -34,7 +36,8 @@ class SqlFuncUnittest(unittest.TestCase):
 
         for row in self.engine.select_row(sel):
             print(row.data)
-            
+            break
+        
     def test_max(self):
         """测试max函数。
         """
@@ -45,7 +48,8 @@ class SqlFuncUnittest(unittest.TestCase):
         
         for row in self.engine.select_row(sel):
             print(row.data)
-
+            break
+        
     def test_min(self):
         """测试min函数。
         """
@@ -56,7 +60,20 @@ class SqlFuncUnittest(unittest.TestCase):
         
         for row in self.engine.select_row(sel):
             print(row.data)
-
+            break
+        
+    def test_min(self):
+        """测试round函数。
+        """
+        table = self.table
+        sel = Select([table.c._int, func.round(table.c._real)])
+        print("{:=^100}".format("SELECT ROUND"))
+        print(sel.sql)
+        
+        for row in self.engine.select_row(sel):
+            print(row.data)
+            break
+    
     def test_abs(self):
         """测试abs函数。
         """
@@ -67,6 +84,7 @@ class SqlFuncUnittest(unittest.TestCase):
         
         for row in self.engine.select_row(sel):
             print(row.data)
+            break
             
     def test_length(self):
         """测试length函数。
@@ -78,6 +96,7 @@ class SqlFuncUnittest(unittest.TestCase):
         
         for row in self.engine.select_row(sel):
             print(row.data)
+            break
 
     def test_lower(self):
         """测试lower函数。
@@ -89,6 +108,7 @@ class SqlFuncUnittest(unittest.TestCase):
         
         for row in self.engine.select_row(sel):
             print(row.data)
+            break
 
     def test_upper(self):
         """测试upper函数。
@@ -100,6 +120,7 @@ class SqlFuncUnittest(unittest.TestCase):
         
         for row in self.engine.select_row(sel):
             print(row.data)
+            break
             
 if __name__ == "__main__":
     unittest.main()

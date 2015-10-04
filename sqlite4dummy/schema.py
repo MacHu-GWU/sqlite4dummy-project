@@ -37,6 +37,8 @@ class, method, func, exception
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
+from __future__ import print_function
+
 try:
     from sqlite4dummy.validate import validator
 except ImportError:
@@ -51,11 +53,6 @@ try:
     from sqlite4dummy.sql import SQL_Param, asc
 except ImportError:
     from .sql import SQL_Param, asc
-    
-try:
-    import sqlite4dummy.statement as statement
-except ImportError:
-    from .statement import statement
 
 try:
     from sqlite4dummy.pycompatible import _str_type
@@ -157,36 +154,35 @@ class Select(object):
     :class:`Sqlite3Engine<sqlite4dummy.engine.Sqlite3Engine>` 在执行Select对象
     时会将会调用 :attr:`sql<Select.sql>` 其转化为SQL, 然后执行。
     """
-    def __init__(self, columns):
-        self.columns = columns
+    def __init__(self, args):
+        try:
+            self.param_list = [c.to_SQL_Param_instance() for c in args]
+            
+            # 用于储存所有的column_name
+            self.all_column_name = [i.column_name for i in self.param_list]
+            
+            # 用于储存所有的full_name
+            self.all_full_name = [i.full_name for i in self.param_list]
+    
+            # 用于储存SELECT XXX FROM 中 XXX 的部分
+            self.all_selected = [i.param for i in self.param_list]
+            
+            # 用于生成一个临时的Table, 供PickleType Converter编译器使用
+            self.temp_table_columns = [
+                Column(i.label, i.dtype, skip_validate=True) \
+                for i in self.param_list]
+        except:
+            raise SelectObjectError("Initiation Error")
+
+        self.temp_table = Table("temp_table", MetaData(),
+                                *self.temp_table_columns)
         
-        self.selected_item = list() # 所有被选择的Column的全名
-        self._temp_columns = list() #
-        for i in self.columns:
-            # 如果是Column对象
-            if isinstance(i, Column):
-                self.selected_item.append(i.full_name)
-                self._temp_columns.append(Column(
-                    i.column_name,
-                    i.data_type,
-                    ))
-            # 如果不是Column, 则是SQL generic function, 则有特殊设定
-            else:
-                try:
-                    self.selected_item.append(i.param)
-                    self._temp_columns.append(Column(
-                        i.func_name,
-                        i.dtype,
-                        ))
-                except:
-                    raise SelectObjectError("Initiation Error")
-        self._temp_table = Table("_temp_table", MetaData(), *self._temp_columns)
         # construct SELECT WHAT clause
         self.SELECT_WHAT_clause = "SELECT\t%s" % ",\n\t".\
-            join(self.selected_item)
+            join(self.all_selected)
         
         # construct SELECT WHERE clause
-        for i in self.columns:
+        for i in self.param_list:
             try:
                 self.SELECT_FROM_clause = "FROM\t%s" % i.table_name
             except:
@@ -197,7 +193,7 @@ class Select(object):
         self.LIMIT_clause = None
         self.OFFSET_clause = None
 
-    def where(self, *argv):
+    def where(self, *args):
         """where() method is used to filter records. It takes arbitrary many 
         comparison of column and value. SQL_Param object is created for 
         each comparison. And finally we produce the WHERE clause SQL.
@@ -217,7 +213,7 @@ class Select(object):
             :meth:`~Column.between`, :meth:`~Column.like`, :meth:`~Column.in_`
         
         """
-        self.WHERE_clause = "WHERE\t%s" % "\n\tAND ".join([i.param for i in argv])
+        self.WHERE_clause = "WHERE\t%s" % "\n\tAND ".join([i.param for i in args])
         return self
     
     def order_by(self, *argv):
@@ -468,11 +464,16 @@ class Column(object):
     For usage example, go :mod:`unittest page<sqlite4dummy.tests.test_Column>`
     and read the testcase source code.
     """
-    def __init__(self, column_name, data_type, 
-                 nullable=True, default=None, primary_key=False):
-        validator.exam_column_name(column_name)
+    def __init__(self, column_name, data_type,
+                 nullable=True, default=None, primary_key=False, 
+                 skip_validate=False):
+        if not skip_validate:
+            validator.exam_column_name(column_name)
         
         self.column_name = column_name
+        self.full_name = column_name
+        self.table_name = None
+        
         self.data_type = data_type
         self.nullable = nullable
         self.default = default
@@ -489,10 +490,7 @@ class Column(object):
 
         返回列名
         """
-        try:
-            return self.full_name
-        except:
-            return self.column_name
+        return self.full_name
         
     def __repr__(self):
         """Return the string represent the Column object, which can recover 
@@ -532,18 +530,24 @@ class Column(object):
     def asc(self):
         """Construct an Sql parameter in ORDER BY clause or CREATE INDEX clause.
         """
-        return SQL_Param("%s ASC" % self.full_name, 
-                          column_name=self.column_name,
-                          table_name=self.table_name,
-                          sql_name="DESC",)
+        return SQL_Param(
+            param="%s ASC" % self.full_name,
+            column_name=self.column_name,
+            full_name=self.full_name,
+            table_name=self.table_name,
+            sql_name="ASC",
+        )
     
     def desc(self):
         """Construct an Sql parameter in ORDER BY clause or CREATE INDEX clause.
         """
-        return SQL_Param("%s DESC" % self.full_name,
-                          column_name=self.column_name,
-                          table_name=self.table_name,
-                          sql_name="DESC",)
+        return SQL_Param(
+            param="%s DESC" % self.full_name,
+            column_name=self.column_name,
+            full_name=self.full_name,
+            table_name=self.table_name,
+            sql_name="DESC",
+        )
     
     # comparison operator
     def __lt__(self, other):
@@ -552,7 +556,7 @@ class Column(object):
                 self.full_name, other.full_name)) 
         else:
             return SQL_Param("%s < %s" % (
-                self.full_name, self.to_sql_param(other)))
+                self.full_name, self.to_sql_param(other)) )
 
     def __le__(self, other):
         if isinstance(other, Column):
@@ -560,7 +564,7 @@ class Column(object):
                 self.full_name, other.full_name)) 
         else:
             return SQL_Param("%s <= %s" % (
-                self.full_name, self.to_sql_param(other)))
+                self.full_name, self.to_sql_param(other)) )
     
     def __eq__(self, other):
         if isinstance(other, Column):
@@ -571,7 +575,7 @@ class Column(object):
                 return SQL_Param("%s IS NULL" % self.full_name)
             else:
                 return SQL_Param("%s = %s" % (
-                    self.full_name, self.to_sql_param(other)))
+                    self.full_name, self.to_sql_param(other)) )
         
     def __ne__(self, other):
         if isinstance(other, Column):
@@ -582,7 +586,7 @@ class Column(object):
                 return SQL_Param("%s NOT NULL" % self.full_name)
             else:
                 return SQL_Param("%s != %s" % (
-                    self.full_name, self.to_sql_param(other)))
+                    self.full_name, self.to_sql_param(other)) )
         
     def __gt__(self, other):
         if isinstance(other, Column):
@@ -590,7 +594,7 @@ class Column(object):
                 self.full_name, other.full_name))
         else:
             return SQL_Param("%s > %s" % (
-                self.full_name, self.to_sql_param(other)))
+                self.full_name, self.to_sql_param(other)) )
     
     def __ge__(self, other):
         if isinstance(other, Column):
@@ -598,106 +602,164 @@ class Column(object):
                 self.full_name, other.full_name))
         else:
             return SQL_Param("%s >= %s" % (
-                self.full_name, self.to_sql_param(other)))
+                self.full_name, self.to_sql_param(other)) )
     
     def between(self, lowerbound, upperbound):
-        """WHERE...BETWEEN...AND... clause.
+        """WHERE ... BETWEEN ... AND ... clause.
         """
         if isinstance(lowerbound, Column) and isinstance(upperbound, Column):
-            return SQL_Param("%s BETWEEN %s AND %s" % (
-                self.full_name,
-                lowerbound.full_name,
-                upperbound.full_name,
-                ))
-        elif isinstance(lowerbound, Column) and \
-            (not isinstance(upperbound, Column)):
-            return SQL_Param("%s BETWEEN %s AND %s" % (
-                self.full_name,
-                lowerbound.full_name,
-                self.to_sql_param(upperbound),
-                ))
-        elif isinstance(upperbound, Column) and \
-            (not isinstance(lowerbound, Column)):
-            return SQL_Param("%s BETWEEN %s AND %s" % (
-                self.full_name,
-                self.to_sql_param(lowerbound),
-                upperbound.full_name,
-                ))
+            return SQL_Param(
+                param="%s BETWEEN %s AND %s" % (
+                    self.full_name,
+                    lowerbound.full_name, 
+                    upperbound.full_name,
+                ),
+                sql_name="BETWEEN",
+            )
+        elif isinstance(lowerbound, Column) \
+                and (not isinstance(upperbound, Column)):
+            return SQL_Param(
+                param="%s BETWEEN %s AND %s" % (
+                    self.full_name,
+                    lowerbound.full_name,
+                    self.to_sql_param(upperbound),
+                ),
+                sql_name="BETWEEN",
+            )
+        elif isinstance(upperbound, Column) \
+                and (not isinstance(lowerbound, Column)):
+            return SQL_Param(
+                param="%s BETWEEN %s AND %s" % (
+                    self.full_name,
+                    self.to_sql_param(lowerbound),
+                    upperbound.full_name,
+                ),
+                sql_name="BETWEEN",
+            )
         else:
-            return SQL_Param("%s BETWEEN %s AND %s" % (
-                self.full_name,
-                self.to_sql_param(lowerbound),
-                self.to_sql_param(upperbound),
-                ))
+            return SQL_Param(
+                param="%s BETWEEN %s AND %s" % (
+                    self.full_name,
+                    self.to_sql_param(lowerbound),
+                    self.to_sql_param(upperbound),
+                ),
+                sql_name="BETWEEN",
+            )
 
     def like(self, wildcards):
-        """WHERE...LIKE... clause.
+        """WHERE ... LIKE ... clause.
         """
-        return SQL_Param("%s LIKE %s" % (self.full_name, 
-            self.to_sql_param(wildcards)))
+        return SQL_Param(
+                param="%s LIKE %s" % (
+                    self.full_name, self.to_sql_param(wildcards)),
+                sql_name="LIKE",
+            )
 
-    def in_(self, candidates):
-        """WHERE...IN... clause.
+    def in_(self, choice):
+        """WHERE ... IN ... clause.
         """
-        return SQL_Param("%s IN (%s)" % (self.full_name,
-            ", ".join([self.to_sql_param(candidate) for candidate in candidates])
-            ))
+        return SQL_Param(
+                param="%s IN (%s)" % (
+                    self.full_name, 
+                    ", ".join([self.to_sql_param(i) for i in choice]),
+                ),
+                sql_name="IN"
+            )
 
     def __add__(self, other):
-        """Column + other
+        """Column + other.
         """
         if isinstance(other, Column):
-            return SQL_Param("%s + %s" % (self.full_name, other.full_name) )
+            return SQL_Param(
+                param="%s + %s" % (self.full_name, other.full_name),
+                dtype=self.data_type,
+            )
         else:
-            return SQL_Param("%s + %s" % (self.full_name, 
-                                           self.to_sql_param(other)) )
+            return SQL_Param(
+                param="%s + %s" % (self.full_name, self.to_sql_param(other)),
+                dtype=self.data_type,
+            )
     
     def __sub__(self, other):
-        """Column - other
+        """Column - other.
         """
         if isinstance(other, Column):
-            return SQL_Param("%s - %s" % (self.full_name, other.full_name) )
+            return SQL_Param(
+                param="%s - %s" % (self.full_name, other.full_name),
+                dtype=self.data_type,
+            )
         else:
-            return SQL_Param("%s - %s" % (self.full_name, 
-                                           self.to_sql_param(other)) )
+            return SQL_Param(
+                param="%s - %s" % (self.full_name, self.to_sql_param(other)),
+                dtype=self.data_type,
+            )
     
     def __mul__(self, other):
-        """Column * other
+        """Column * other.
         """
         if isinstance(other, Column):
-            return SQL_Param("%s * %s" % (self.full_name, other.full_name) )
+            return SQL_Param(
+                param="%s * %s" % (self.full_name, other.full_name),
+                dtype=self.data_type,
+            )
         else:
-            return SQL_Param("%s * %s" % (self.full_name, 
-                                           self.to_sql_param(other)) )
+            return SQL_Param(
+                param="%s * %s" % (self.full_name, self.to_sql_param(other)),
+                dtype=self.data_type,
+            )
     
     def __div__(self, other):
-        """Column / other
+        """Column / other.
         """
         if isinstance(other, Column):
-            return SQL_Param("%s / %s" % (self.full_name, other.full_name) )
+            return SQL_Param(
+                param="%s / %s" % (self.full_name, other.full_name),
+                dtype=self.data_type,
+            )
         else:
-            return SQL_Param("%s / %s" % (self.full_name, 
-                                           self.to_sql_param(other)) )
+            return SQL_Param(
+                param="%s / %s" % (self.full_name, self.to_sql_param(other)),
+                dtype=self.data_type,
+            )
             
     def __truediv__(self, other):
-        """Column / other, for python2,3 compatible
+        """Column / other, for python2,3 compatible.
         """
         if isinstance(other, Column):
-            return SQL_Param("%s / %s" % (self.full_name, other.full_name) )
+            return SQL_Param(
+                param="%s / %s" % (self.full_name, other.full_name),
+                dtype=self.data_type,
+            )
         else:
-            return SQL_Param("%s / %s" % (self.full_name, 
-                                           self.to_sql_param(other)) )
+            return SQL_Param(
+                param="%s / %s" % (self.full_name, self.to_sql_param(other)),
+                dtype=self.data_type,
+            )
     
     def __pos__(self):
-        """+ Column
+        """+ Column.
         """
-        return SQL_Param("+ %s" % self.full_name)
+        return SQL_Param(param="+ %s" % self.full_name, dtype=self.data_type)
     
     def __neg__(self):
-        """- Column
+        """- Column.
         """
-        return SQL_Param("- %s" % self.full_name)
+        return SQL_Param(param="- %s" % self.full_name, dtype=self.data_type)
     
+    def to_SQL_Param_instance(self):
+        # 如果只是列的话, param使用column_name, 这样才能让Row能够直接通过列名
+        # 而不是全名来访问值。
+        return SQL_Param( 
+            param="%s" % self.column_name,
+            column_name=self.column_name,
+            full_name=self.full_name,
+            table_name=self.table_name,
+            dtype=self.data_type,
+        )
+        
+    def as_(self, label):
+        return self.to_SQL_Param_instance().as_(label)
+        
 ###############################################################################
 #                                Table Class                                  #
 ###############################################################################
@@ -715,6 +777,68 @@ class ColumnCollection(object):
                 object.__setattr__(self, column.column_name, column)
         if len({column.column_name for column in args}) != len(args):
             raise DuplicateColumnError("Duplicate column name found!")
+
+class CreateTable(object):
+    """Generate 'CREATE TABLE' SQL statement.
+    
+    Example::
+    
+        CREATE TABLE table_name
+        (
+            column_name1 dtype1 CONSTRAINS,
+            column_name2 dtype2 CONSTRAINS,
+            PRIMARY KEY (column, ...),
+            FOREIGN KEY (table_column, ...)
+        )
+        
+    **中文文档**
+    
+    创建Table的抽象类, 用于根据Schema生成CREATE TABLE ...的SQL语句。目前不支持
+    FOREIGN KEY语法。
+    """
+    def __init__(self, table):
+        clause_CREATE_TABLE = "CREATE TABLE %s" % table.table_name
+        
+        clause_DATATYPE = "\t" + ",\n\t".join(
+            [self._column_param(column) for column in table]
+            )
+            
+        if len(table.primary_key_columns) == 0:
+            clause_PRIMARY_KEY = ""
+        else:
+            clause_PRIMARY_KEY = ",\n\tPRIMARY KEY (%s)" % ", ".join(
+                                                table.primary_key_columns)
+
+        self.sql = "%s\n(\n%s%s\n)" % (
+            clause_CREATE_TABLE, clause_DATATYPE, clause_PRIMARY_KEY)
+
+    def _column_param(self, column):
+        """Generate the definition part of 'CREATE TABLE (...)' SQL command
+        by column name, data type, constrains.
+        
+        Example::
+        
+            movie_id TEXT
+            title TEXT DEFAULT 'unknown_title'
+            length INTEGER DEFAULT -1
+            release_date DATE NOT NULL
+        """
+        column_name_part = column.column_name
+        data_type_part = column.data_type.sqlite_name
+        
+        if column.nullable == True:
+            nullable_part = None
+        else:
+            nullable_part = "NOT NULL"
+            
+        if column.default == None:
+            default_part = None
+        else:
+            default_part = "DEFAULT %s" % column.to_sql_param(column.default)
+            
+        parts = [column_name_part, data_type_part, nullable_part, default_part]
+        
+        return " ".join([i for i in parts if i])
 
 class Table(object):
     """Represent a table in a database.
@@ -748,7 +872,7 @@ class Table(object):
     
     **中文文档**
     
-    数据表对象
+    :class:`sqlite4dummy.schema.Table` 是抽象数据表对象类。
     
     定义Table的方法如下::
     
@@ -779,9 +903,11 @@ class Table(object):
         self.pickletype_columns = list()
         
         for column in args:
+            
             column.bind_table(self) # 将column与Table绑定
             self.all.append(column)
             self.column_names.append(column.column_name)
+            
             if column.primary_key: # 定位PRIMARY KEY的列
                 self.primary_key_columns.append(column.column_name)
             if column.is_pickletype: # 定位PICKLETYPE的列
@@ -789,6 +915,8 @@ class Table(object):
         
         self.c = ColumnCollection(*self.all)
         self.metadata._add_table(self)
+        
+        self.create_table_sql = CreateTable(self).sql
         
     def __str__(self):
         """Return table name.
@@ -808,13 +936,19 @@ class Table(object):
         返回代表Table的详细信息的字符串。可以通过这个字符串完整地复原出Table
         对象。
         """
-        template = "Table('%s', MetaData(), \n\t%s\n\t)"
+        template = "Table('%s', MetaData(), \n\t%s,\n)"
         return template % (
             self.table_name, 
             ",\n\t".join([repr(column) for column in self.all])
             )
         
     def __iter__(self):
+        """For loop iterate on all instance of Column.
+        
+        **中文文档**
+        
+        for ... in table: 返回的是Table中所有Column对象的实例
+        """
         return iter(self.all)
     
     def get_column(self, column_name):
@@ -825,13 +959,6 @@ class Table(object):
         根据列名称获取Column对象。
         """
         return getattr(self.c, column_name)
-    
-    @property
-    def create_table_sql(self):
-        """The SQL for creating this Table.
-        """
-        constructor = statement.CreateTable(self)
-        return constructor.sql
     
     def create(self, engine):
         """Create this table in the database binded to the Sqlite3Engine.
@@ -914,8 +1041,9 @@ class Index(object):
     选参数``table_name``。在其他时候, 我们并不需要显式地指定表名。
     """
     def __init__(self, index_name, metadata, table_name=None, unique=False, 
-                 *args):
-        validator.exam_table_name(index_name)
+                 skip_validate=False, *args):
+        if not skip_validate:
+            validator.exam_table_name(index_name)
         
         self.index_name = index_name
         self.metadata = metadata
@@ -970,7 +1098,7 @@ class Index(object):
         对象。
         """
         template = ("Index('%s', MetaData(), \n\t%s\n\t"
-                    "table_name=%s,\n\tunique=%s,\n\t)")
+                    "table_name=%s,\n\tunique=%s,\n)")
         return template % (
             self.index_name, 
             ",\n\t".join([repr(i) for i in self.params]),
@@ -1017,9 +1145,13 @@ class Index(object):
 ###############################################################################
 
 class DuplicateTableError(Exception):
+    """Raises when duplicated table name been added into metadata.
+    """
     pass
 
 class DuplicateIndexError(Exception):
+    """Raises when duplicated index name been added into metadata.
+    """
     pass
 
 class MetaData(object):
@@ -1042,8 +1174,8 @@ class MetaData(object):
         MetaData.create_all(engine)
     """
     def __init__(self, bind=None):
-        self.t = OrderedDict()
-        self.i = OrderedDict()
+        self.t = OrderedDict() # table dict
+        self.i = OrderedDict() # index dict
         if bind:
             try:
                 self.reflect(bind)
@@ -1136,8 +1268,9 @@ class MetaData(object):
             create_table_sql = table.create_table_sql
             try:
                 engine.execute(create_table_sql)
+                engine.logger.info(create_table_sql)
             except Exception as e:
-                print("Exception: %s" % e)
+                engine.logger.info("Exception: %s" % e)
 
     def drop_all(self, engine):
         """Drop all table in metadata in database engine. Also bind itself to
@@ -1148,9 +1281,10 @@ class MetaData(object):
             drop_table_sql = table.drop_table_sql
             try:
                 engine.execute(drop_table_sql)
+                engine.logger.info(drop_table_sql)
                 self._remove_table(table.table_name)
             except Exception as e:
-                print("Exception: %s" % e)
+                engine.logger.info("Exception: %s" % e)
                 
     def reflect(self, engine, pickletype_columns=list()):
         """Read table, column, index metadata from database schema information.
@@ -1188,7 +1322,7 @@ class MetaData(object):
                 # 获得是否是primary_key
                 primary_key = is_primarykey == 1
                 # construct Column
-                column = Column(column_name, column_type, 
+                column = Column(column_name, column_type, skip_validate=True,
                                 primary_key=primary_key, nullable=nullable,
                                 default=default)
                 columns.append(column)
@@ -1205,5 +1339,5 @@ class MetaData(object):
             params = [i.strip() for i in params]
 
             unique = "CREATE UNIQUE INDEX" in sql
-            _ = Index(index_name, self, table_name, unique, *params)
+            _ = Index(index_name, self, table_name, unique, True, *params)
             

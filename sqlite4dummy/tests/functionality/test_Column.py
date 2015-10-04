@@ -31,7 +31,12 @@ class ColumnUnittest(unittest.TestCase):
         self.assertEqual(str(column), "_text")
         self.assertEqual(repr(column), 
             "Column('_text', dtype.TEXT, nullable=True, default='hello world', primary_key=False)")
-        
+
+        column = Column("_int", dtype.INTEGER, nullable=False)
+        self.assertEqual(str(column), "_int")
+        self.assertEqual(repr(column), 
+            "Column('_int', dtype.INTEGER, nullable=False, default=None, primary_key=False)")
+
         column = Column("_float", dtype.REAL, nullable=False)
         self.assertEqual(str(column), "_float")
         self.assertEqual(repr(column), 
@@ -134,7 +139,7 @@ class ColumnUnittest(unittest.TestCase):
         
         self.assertIn(
             (column == [1, 2, 3]).param, 
-            ["test._pickle = X'80035d7100284b014b024b03652e'",
+            ["test._pickle = X'80035d7100284b014b024b03652e'", # Py3
              "test._pickle = X'80025d7100284b014b024b03652e'"],
             )
         self.assertIn(

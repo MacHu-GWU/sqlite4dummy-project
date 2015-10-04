@@ -108,7 +108,7 @@ class UpdateSqlUnittest(unittest.TestCase):
              b"8e01ad49", [1, 2, 3]),
             (2, 300, 91.8, "ijk", date(2000, 1, 1), datetime(2014, 7, 15),
              b"8e01ad49", [1, 2, 3]),
-            ]
+        ]
         self.engine.insdate_many_record(ins, records)
         
         # 检查更新后的值是否正确

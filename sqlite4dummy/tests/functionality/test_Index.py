@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-本测试模块用于测试与 :class:`sqlite4dummy.schema.Index` 有关的方法
+本测试模块用于测试与 :class:`sqlite4dummy.schema.Index` 有关的方法。
 
 
 class, method, func, exception
@@ -38,10 +38,11 @@ class IndexUnittest(unittest.TestCase):
         """测试Index对象能否被成功初始化。
         """
         product = self.product
-        index = Index("name_index", self.metadata, product, True,
+        index = Index("name_index", self.metadata, product, True, False,
                       product.c.product_name, product.c.price.desc())
         self.assertEqual(str(index), "name_index")
         print(repr(index))
+        print(index.create_index_sql)
         
     def test_create_index(self):
         """测试Index被创建前后, sqlite_master中的关于index信息的变化。

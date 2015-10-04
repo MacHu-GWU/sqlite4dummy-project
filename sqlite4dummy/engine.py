@@ -61,9 +61,12 @@ except ImportError:
     from .schema import Select
 
 from collections import OrderedDict
+from datetime import datetime
 import sqlite3
 import pickle
+import logging
 import sys
+import os
 
 try:
     import pandas as pd
@@ -71,9 +74,9 @@ except ImportError:
     print("pandas not found, the select_df feature is not able to work.")
 
 if sys.version_info[0] == 3:
-    pk_protocol = 3
+    PK_PROTOCOL = 3
 else:
-    pk_protocol = 2
+    PK_PROTOCOL = 2
 
 class PickleTypeConverter():
     """High performance PickleType data converter Class.
@@ -130,7 +133,7 @@ class PickleTypeConverter():
                 if value:
                     if column.is_pickletype:
                         new_record.append(
-                            pickle.dumps(value, protocol=pk_protocol))
+                            pickle.dumps(value, protocol=PK_PROTOCOL))
                     else:
                         new_record.append(value)
                 else:
@@ -158,7 +161,7 @@ class PickleTypeConverter():
                 if value:
                     if self.table.get_column(column_name).is_pickletype:
                         new_values.append(
-                            pickle.dumps(value, protocol=pk_protocol))
+                            pickle.dumps(value, protocol=PK_PROTOCOL))
                     else:
                         new_values.append(value)
                 else:
@@ -295,15 +298,19 @@ class Sqlite3Engine():
     - :meth:`~Sqlite3Engine.all_tablename`
     - :meth:`~Sqlite3Engine.all_indexname`
     """
-    def __init__(self, dbname, autocommit=True):
+    def __init__(self, dbname, 
+            autocommit=True, echo=False, log=False):
         self.dbname = dbname
         self.connect = sqlite3.connect(
             dbname, detect_types=sqlite3.PARSE_DECLTYPES)
         self.connect.text_factory = str
+        
         self.cursor = self.connect.cursor()
         
         self.set_autocommit(autocommit)
-    
+        
+        self.set_logger(echo, log)
+        
     def __str__(self):
         return "Sqlite3Engine(dbname=r'%s', autocommit=%s)" % (
             self.dbname, self.is_autocommit)
@@ -311,6 +318,11 @@ class Sqlite3Engine():
     def __repr__(self):
         return "Sqlite3Engine(dbname=r'%s', autocommit=%s)" % (
             self.dbname, self.is_autocommit)
+    
+    def close(self):
+        """Close the connection.
+        """
+        self.connect.close()
     
     def execute(self, sql, *args):
         """Execute SQL command.
@@ -366,6 +378,38 @@ class Sqlite3Engine():
             self.is_autocommit = False
             self._commit = self.commit_nothing
     
+    def set_logger(self, echo, log):
+        """Switch on or off echo Sql command.
+        """
+        log_dir = "sqlite4dummy_log"
+        log_file = "%s.log" % datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%M-%S.%f")
+        log_path = os.path.join(log_dir, log_file)
+        
+        logger = logging.getLogger("sqlite4dummy")
+        
+        # Debug level
+        logger.setLevel(logging.DEBUG)
+        
+        # Print screen level
+        ch = logging.StreamHandler()
+        if echo: # print message only higher than INFO
+            ch.setLevel(logging.INFO)
+        else: # print message only higher than WARNING
+            ch.setLevel(logging.WARNING)
+        logger.addHandler(ch)
+        
+        # File and format
+        if log:
+            try:
+                os.mkdir(log_dir)
+            except:
+                pass
+            fh = logging.FileHandler(log_path)
+            formatter = logging.Formatter("[%(asctime)s][%(name)s][%(levelname)s][%(message)s]")
+            fh.setFormatter(formatter)
+            logger.addHandler(fh)
+        self.logger = logger
+        
     # non-compiled version of pickle record/row converter
     def convert_record(self, table, record):
         """Non-compiled version of pickle record converter.
@@ -381,7 +425,7 @@ class Sqlite3Engine():
                 if value:
                     if column.is_pickletype:
                         new_record.append(
-                            pickle.dumps(value, protocol=pk_protocol))
+                            pickle.dumps(value, protocol=PK_PROTOCOL))
                     else:
                         new_record.append(value)
                 else:
@@ -404,7 +448,7 @@ class Sqlite3Engine():
                 if value:
                     if table.get_column(column_name).is_pickletype:
                         new_values.append(
-                            pickle.dumps(value, protocol=pk_protocol))
+                            pickle.dumps(value, protocol=PK_PROTOCOL))
                     else:
                         new_values.append(value)
                 else:
@@ -428,7 +472,6 @@ class Sqlite3Engine():
         插入单条tuple或list数据。
         """
         ins_obj.sql_from_record()
-        print(ins_obj.sql, self.convert_record(ins_obj.table, record))
         self.cursor.execute(ins_obj.sql, self.convert_record(
                                             ins_obj.table, record))
         self._commit()
@@ -537,7 +580,7 @@ class Sqlite3Engine():
             self.insert_many_row(ins_obj, chunk)
         self._commit()
         
-    # Execute Select
+    # Execute Select    
     def select(self, sel_obj, return_tuple=False):
         """Execute :class:`~sqlite4dummy.schema.Select` object, 
         if ``return_tuple=True``, yield ``tuple``, else, yield ``list``.
@@ -546,7 +589,8 @@ class Sqlite3Engine():
         
         执行 :class:`~sqlite4dummy.schema.Select` 对象, 返回tuple数据
         """
-        adaptor = PickleTypeConverter(sel_obj._temp_table)
+        self.logger.info(sel_obj.sql)
+        adaptor = PickleTypeConverter(sel_obj.temp_table)
         if return_tuple:
             return map(adaptor.recover_tuple_record, 
                        self.cursor.execute(sel_obj.sql))
@@ -573,7 +617,7 @@ class Sqlite3Engine():
         执行 :class:`~sqlite4dummy.schema.Select` 对象, 返回
         :class:`~sqlite4dummy.row.Row` 数据。
         """
-        adaptor = PickleTypeConverter(sel_obj._temp_table)
+        adaptor = PickleTypeConverter(sel_obj.temp_table)
         return map(adaptor.recover_row, 
                    self.cursor.execute(sel_obj.sql))
     
@@ -595,11 +639,11 @@ class Sqlite3Engine():
         执行 :class:`~sqlite4dummy.schema.Select` 对象, 返回以列为导向的字典视图。
         """
         d = OrderedDict()
-        for column_name in sel_obj._temp_table.column_names:
+        for column_name in sel_obj.temp_table.column_names:
             d[column_name] = list()
         for record in self.select(sel_obj):
             for column_name, value in zip(
-                sel_obj._temp_table.column_names, record):
+                sel_obj.temp_table.column_names, record):
                 d[column_name].append(value)
         return d
     
@@ -617,7 +661,7 @@ class Sqlite3Engine():
         """
         return pd.DataFrame(
             list(self.select(sel_obj)),
-            columns=sel_obj._temp_table.column_names,
+            columns=sel_obj.temp_table.column_names,
             )
     
     # Execute Update
@@ -918,13 +962,13 @@ if __name__ == "__main__":
             """
             self.assertEqual(self.engine.convert_record(self.has_pk, 
                                                         ("F-001", [1, 2, 3])),
-                             ['F-001', pickle.dumps([1, 2, 3], protocol=pk_protocol)])
+                             ['F-001', pickle.dumps([1, 2, 3], protocol=PK_PROTOCOL)])
             self.assertEqual(self.engine.convert_row(self.has_pk,
                                                      Row(("_id",), ("F-001",))),
                              ["F-001",])
             self.assertEqual(self.engine.convert_row(self.has_pk,
                              Row(("_id", "_list"), ("F-001", [1, 2, 3]))),
-                             ["F-001", pickle.dumps([1, 2, 3], protocol=pk_protocol)])
+                             ["F-001", pickle.dumps([1, 2, 3], protocol=PK_PROTOCOL)])
              
             self.assertEqual(self.engine.convert_record(self.no_pk, 
                                                         ("F-001", 100)),
