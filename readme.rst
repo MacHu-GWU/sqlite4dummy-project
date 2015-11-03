@@ -8,7 +8,7 @@ A high performance and easy to use sqlite API for Data Scientist.
 Quick links:
 
 - `Home page <https://github.com/MacHu-GWU/sqlite4dummy-project>`_
-- `Online Documentation <http://sqlite4dummy-project.readthedocs.org/>`_
+- `Online Documentation <http://www.wbh-doc.com.s3.amazonaws.com/sqlite4dummy/index.html>`_
 - `PyPI download <https://pypi.python.org/pypi/sqlite4dummy>`_
 - `Install <install_>`_
 
