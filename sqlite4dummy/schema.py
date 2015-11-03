@@ -1040,14 +1040,17 @@ class Index(object):
     是包含了所属的table对象的信息的。当Index只由字符串生成时, 则要额外指定可
     选参数``table_name``。在其他时候, 我们并不需要显式地指定表名。
     """
-    def __init__(self, index_name, metadata, table_name=None, unique=False, 
-                 skip_validate=False, *args):
+    def __init__(self, index_name, metadata, args,
+                 table_name=None, unique=False, skip_validate=False):
         if not skip_validate:
             validator.exam_table_name(index_name)
         
         self.index_name = index_name
         self.metadata = metadata
-        self.table_name = str(table_name)
+        if table_name:
+            self.table_name = str(table_name)
+        else:
+            self.table_name = None
         self.unique = unique
         self.params = list()
 
@@ -1060,7 +1063,7 @@ class Index(object):
             if isinstance(i, Column): # column
                 self.params.append("%s ASC" % i.column_name)
             elif isinstance(i, _str_type): # string
-                self.params.append(i)
+                self.params.append(i.split(".")[-1]) # use column_name only
             else: # _SQL_PARAM
                 self.params.append("%s %s" % (i.column_name, i.sql_name))
                 
@@ -1069,7 +1072,7 @@ class Index(object):
                     if self.table_name != i.table_name:
                         raise IndexObjectError("Table name are not unique!")
                 else:
-                    self.table_name = i.table_name
+                    self.table_name = i.table_name   
             except:
                 pass
         
@@ -1097,7 +1100,7 @@ class Index(object):
         返回代表Index的详细信息的字符串。可以通过这个字符串完整地复原出Index
         对象。
         """
-        template = ("Index('%s', MetaData(), \n\t%s\n\t"
+        template = ("Index('%s', MetaData(), \n\t%s,\n\t"
                     "table_name=%s,\n\tunique=%s,\n)")
         return template % (
             self.index_name, 
@@ -1264,7 +1267,7 @@ class MetaData(object):
         this engine.
         """
         self.bind = engine
-        for table in self:
+        for table in self.t.values():
             create_table_sql = table.create_table_sql
             try:
                 engine.execute(create_table_sql)
@@ -1285,7 +1288,34 @@ class MetaData(object):
                 self._remove_table(table.table_name)
             except Exception as e:
                 engine.logger.info("Exception: %s" % e)
-                
+
+    def create_all_index(self, engine):
+        """Create all index in metadata in database engine. Also bind itself to 
+        this engine.
+        """
+        self.bind = engine
+        for index in self.i.values():
+            create_index_sql = index.create_index_sql
+            try:
+                engine.execute(create_index_sql)
+                engine.logger.info(create_index_sql)
+            except Exception as e:
+                engine.logger.info("Exception: %s" % e)
+
+    def drop_all_index(self, engine):
+        """Drop all index in metadata in database engine. Also bind itself to
+        this engine.
+        """
+        self.bind = engine
+        for index in self.i.values():
+            drop_index_sql = index.drop_index_sql
+            try:
+                engine.execute(drop_index_sql)
+                engine.logger.info(drop_index_sql)
+                self._remove_index(index.index_name)
+            except Exception as e:
+                engine.logger.info("Exception: %s" % e)
+      
     def reflect(self, engine, pickletype_columns=list()):
         """Read table, column, index metadata from database schema information.
         
@@ -1293,7 +1323,6 @@ class MetaData(object):
         
         :param pickletype_columns: pickletype columns' full name list. e.g. 
           [table_name1.column_name1, table_name2.column_name2, ...]
-        
         """
         self.bind = engine
 
@@ -1339,5 +1368,8 @@ class MetaData(object):
             params = [i.strip() for i in params]
 
             unique = "CREATE UNIQUE INDEX" in sql
-            _ = Index(index_name, self, table_name, unique, True, *params)
+            _ = Index(index_name, self, params,
+                      table_name=table_name, 
+                      unique=unique, 
+                      skip_validate=True)
             

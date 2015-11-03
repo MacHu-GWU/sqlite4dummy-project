@@ -17,7 +17,7 @@ Table of Contents
    	Chapter7. Delete data <chapter7>
    	About <about>
    	
-.. _indice-and-tables:
+.. _indice_and_tables:
 
 Indices and tables
 --------------------------------------------------------------------------------

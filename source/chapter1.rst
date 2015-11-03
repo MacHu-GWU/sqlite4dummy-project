@@ -39,11 +39,11 @@ There's two ways:
 
 	ins = employee.insert() # initiate Insert object
 	record = (1, "John David", "male", 174.5, date(2000, 1, 1), 
-		{ # json data (PICKLETYPE)
-			"title": "System engineer",
-			"salary": 56000,
-			"unit": "USD",
-		},
+	    { # json data (PICKLETYPE)
+	        "title": "System engineer",
+	        "salary": 56000,
+	        "unit": "USD",
+	    },
 	)
 	engine.insert_record(ins, record)
 	engine.commit()
@@ -54,22 +54,22 @@ There's two ways:
 
 .. code-block:: python
 	
-	from datetime import date
+    from datetime import date
 
-	ins = employee.insert()
-	row = Row.from_dict({
-		"_id": 2,
-		"name": "Black Johnson",
-		"height": 185.5,
-		"hire_date": date(2007, 5, 15),
-		"profile": {
-			"title": "Marketing specialist",
-			"salary": 47000,
-			"unit": "USD",
-			"location": "New York",
-			"memo": "A very nice person",
-		}
-	})
+    ins = employee.insert()
+    row = Row.from_dict({
+        "_id": 2,
+        "name": "Black Johnson",
+        "height": 185.5,
+        "hire_date": date(2007, 5, 15),
+        "profile": {
+            "title": "Marketing specialist",
+            "salary": 47000,
+            "unit": "USD",
+            "location": "New York",
+            "memo": "A very nice person",
+        }
+    })
 
 	engine.insert_row(ins, row)
 	engine.commit()
@@ -86,7 +86,7 @@ select all
 
 	sel = Select(employee.all) # Create a Select object
 	for record in engine.select(sel):
-		print(record)
+	    print(record)
 
 select columns
 
@@ -102,7 +102,7 @@ where clause
 
 	sel = Select(employee.all).where(employee.c._id==1)
 	for record in engine.select(sel):
-		print(record)
+	    print(record)
 
 
 Update data

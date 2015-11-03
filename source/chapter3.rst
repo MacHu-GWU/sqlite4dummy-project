@@ -13,9 +13,9 @@ Connection and Cursor
 
 .. code-block:: python
 
-	engine = Sqlite3Engine(":memory:")
-	engine.connect # sqlite3.Connect instance
-	engine.cursor # sqlite3.Cursor instance
+    engine = Sqlite3Engine(":memory:")
+    engine.connect # sqlite3.Connect instance
+    engine.cursor # sqlite3.Cursor instance
 
 You can call :meth:`sqlite4dummy.engine.Sqlite3Engine.execute` (some time :meth:`sqlite4dummy.engine.Sqlite3Engine.executemany`) to execute arbitrary Sql command as you do in generic sqlite3 Python API.
 
@@ -31,20 +31,20 @@ Do this:
 
 .. code-block:: python
 
-	engine = Sqlite3Engine("test.db", autocommit=False)
+    engine = Sqlite3Engine("test.db", autocommit=False)
 
 Or:
 
 .. code-block:: python
 
-	engine = Sqlite3Engine("test.db")
-	engine.set_autocommit(False)
+    engine = Sqlite3Engine("test.db")
+    engine.set_autocommit(False)
 
 Manually do commit:
 
 .. code-block:: python
 
-	engine.commit()
+    engine.commit()
 
 
 Vanilla method
@@ -59,9 +59,9 @@ return how many records in a table.
 
 .. code-block:: python
 
-	... define a table = Table(...)
+    ... define a table = Table(...)
 
-	count = engine.howmany(table) # SELECT COUNT(*) FROM (SELECT * FROM table)
+    count = engine.howmany(table) # SELECT COUNT(*) FROM (SELECT * FROM table)
 
 
 :meth:`~sqlite4dummy.engine.Sqlite3Engine.tabulate`
@@ -71,7 +71,7 @@ return all records packed in a list in a table.
 
 .. code-block:: python
 
-	data = engine.tabulate(table) # list of record
+    data = engine.tabulate(table) # list of record
 
 
 :meth:`~sqlite4dummy.engine.Sqlite3Engine.dictize`
@@ -81,8 +81,8 @@ return all records in a column oriented view in a table.
 
 .. code-block:: python
 
-	data = engine.dictize(table)
-	data["#column_name"] # get all column data
+    data = engine.dictize(table)
+    data["#column_name"] # get all column data
 
 
 :meth:`~sqlite4dummy.engine.Sqlite3Engine.to_df`
@@ -92,8 +92,8 @@ return all records in pandas.DataFrame view in a table. `pandas <http://pandas.p
 
 .. code-block:: python
 
-	df = engine.to_df(table)
-	df["#column_name"] # get all column data
+    df = engine.to_df(table)
+    df["#column_name"] # get all column data
 
 
 :meth:`~sqlite4dummy.engine.Sqlite3Engine.prt_all`
@@ -103,7 +103,7 @@ print all records in a table.
 
 .. code-block:: python
 
-	engine.prt_all(table) # this should print all data in a table
+    engine.prt_all(table) # this should print all data in a table
 
 
 :meth:`~sqlite4dummy.engine.Sqlite3Engine.remove_all`
@@ -113,8 +113,8 @@ remove all data in a table by Table object (or by table name).
 
 .. code-block:: python
 
-	engine.remove_all(table)
-	engine.prt_all(table) # this should print no data.
+    engine.remove_all(table)
+    engine.prt_all(table) # this should print no data.
 
 
 Next

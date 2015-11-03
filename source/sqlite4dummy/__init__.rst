@@ -10,7 +10,6 @@ subpackage and modules
 .. toctree::
    :maxdepth: 1
 
-	tests <tests/__init__>
 	dtype <dtype>
 	engine <engine>
 	func <func>
@@ -21,4 +20,3 @@ subpackage and modules
 	sql <sql>
 	statement <statement>
 	validate <validate>
-	zzz_manual_install <zzz_manual_install>

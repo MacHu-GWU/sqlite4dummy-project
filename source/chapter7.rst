@@ -10,15 +10,15 @@ Example
 --------------------------------------------------------------------------------
 
 .. code-block:: python
-	
-	... define a table = Table(...)
+    
+    # ... define a table = Table(...)
 
-	del_obj = table.delete()
-	del_obj.where(table.c.column1 >= value1, table.c.column2 <= value2, ...)
-	engine.delete(del_obj)
+    del_obj = table.delete()
+    del_obj.where(table.c.column1 >= value1, table.c.column2 <= value2, ...)
+    engine.delete(del_obj)
 
 
 Wants to know more?
 --------------------------------------------------------------------------------
 
-Now, I believe you pretty much known everything about sqlite4dummy. For arguments/parameters, more usage and source code, Go :ref:`module index <indice-and-tables>`.
+Now, I believe you pretty much known everything about sqlite4dummy. For arguments/parameters, more usage and source code, Go :ref:`module index <indice_and_tables>`.

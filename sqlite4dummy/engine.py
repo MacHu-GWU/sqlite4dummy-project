@@ -78,7 +78,7 @@ if sys.version_info[0] == 3:
 else:
     PK_PROTOCOL = 2
 
-class PickleTypeConverter():
+class PickleTypeConverter(object):
     """High performance PickleType data converter Class.
     
     This is how we handle python type in sqlite database. If I have an entry::
@@ -248,7 +248,7 @@ class PickleTypeConverter():
 #                            Sqlite3Engine class                              #
 ###############################################################################
 
-class Sqlite3Engine():
+class Sqlite3Engine(object):
     """A High level API of sqlite3 engine.
     
     **Database Level**:
@@ -299,7 +299,7 @@ class Sqlite3Engine():
     - :meth:`~Sqlite3Engine.all_indexname`
     """
     def __init__(self, dbname, 
-            autocommit=True, echo=False, log=False):
+            autocommit=False, echo=False, log=False):
         self.dbname = dbname
         self.connect = sqlite3.connect(
             dbname, detect_types=sqlite3.PARSE_DECLTYPES)

@@ -24,16 +24,16 @@ Insert a Row object
 Insert one Row object at a time. If conflict with constrain, raise Errors.
 
 .. code-block:: python
-	
-	... define a table = Table(...)
+    
+    ... define a table = Table(...)
 
-	ins = table.insert()
-	row = Row.from_dict({
-		"#column1": value1
-		"#column2": value2
-		...
-	})
-	engine.insert_row(ins, row)
+    ins = table.insert()
+    row = Row.from_dict({
+        "#column1": value1
+        "#column2": value2
+        ...
+    })
+    engine.insert_row(ins, row)
 
 
 .. _insert-many-record-tuple:
@@ -45,9 +45,9 @@ Insert list of records, automatically skip Exceptions.
 
 .. code-block:: python
 
-	ins = table.insert()
-	record_list = [(value1, value2, ...) for i in range(10)]
-	engine.insert_many_record(ins, record_list)
+    ins = table.insert()
+    record_list = [(value1, value2, ...) for i in range(10)]
+    engine.insert_many_record(ins, record_list)
 
 
 .. _insert-many-row-object:
@@ -59,15 +59,15 @@ Insert list of Row objects, automatically skip Exceptions.
 
 .. code-block:: python
 
-	ins = table.insert()
-	row_list = [
-		{
-			"#column1": value1
-			"#column2": value2
-			...
-		} for i in range(10)
-	]
-	engine.insert_many_row(ins, row_list)
+    ins = table.insert()
+    row_list = [
+        {
+            "#column1": value1
+            "#column2": value2
+            ...
+        } for i in range(10)
+    ]
+    engine.insert_many_row(ins, row_list)
 
 
 Insert many record tuple in a generator stream
@@ -77,13 +77,13 @@ Similar to :ref:`insert-many-record-tuple`, but work with a record tuple generat
 
 .. code-block:: python
 
-	def record_generator()
-		record_list = [(value1, value2, ...) for i in range(10)]
-		for record in record_list:
-			yield record
+    def record_generator()
+        record_list = [(value1, value2, ...) for i in range(10)]
+        for record in record_list:
+            yield record
 
-	ins = table.insert()
-	engine.insert_many_row(ins, record_generator())
+    ins = table.insert()
+    engine.insert_many_row(ins, record_generator())
 
 
 Insert many Row object in a generator stream
@@ -93,19 +93,19 @@ Similar to :ref:`insert-many-row-object`, but work with a Raw object generator.
 
 .. code-block:: python
 
-	def row_generator()
-		row_list = [
-			{
-				"#column1": value1
-				"#column2": value2
-				...
-			} for i in range(10)
-		]
-		for row in row_list:
-			yield row
+    def row_generator()
+        row_list = [
+            {
+                "#column1": value1
+                "#column2": value2
+                ...
+            } for i in range(10)
+        ]
+        for row in row_list:
+            yield row
 
-	ins = table.insert()
-	engine.insert_many_row(ins, row_generator())
+    ins = table.insert()
+    engine.insert_many_row(ins, row_generator())
 
 
 Next

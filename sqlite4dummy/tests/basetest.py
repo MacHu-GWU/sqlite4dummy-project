@@ -212,12 +212,30 @@ class BaseUnittest(unittest.TestCase):
         self.connect.close()
         remove()
 
-class AdvanceUnittest(BaseUnittest):
+class Sqlite3Unittest(BaseUnittest):
+    def setUp(self):
+        self.connect_database(DB_FILE)
+
+class Sqlite3UnittestHasData(BaseUnittest):
+    def setUp(self):
+        self.connect_database(DB_FILE)
+        self.create_all_type_table(has_data=True)
+        self.create_has_pk_table(has_data=True)
+        self.create_non_pk_table(has_data=True)
+        
+class Sqlite3UnittestNoData(BaseUnittest):
+    def setUp(self):
+        self.connect_database(DB_FILE)
+        self.create_all_type_table(has_data=False)
+        self.create_has_pk_table(has_data=False)
+        self.create_non_pk_table(has_data=False)
+        
+class AdvanceUnittestHasData(BaseUnittest):
     """本单元测试基类需要 ``:meth:`sqlite4dummy.schema.MetaData.reflect`` 方法
     正常工作。
     """
     def setUp(self):
-        self.connect_database()
+        self.connect_database(DB_FILE)
         self.create_all_type_table(has_data=True)
         self.create_has_pk_table(has_data=True)
         self.create_non_pk_table(has_data=True)
@@ -228,6 +246,7 @@ class AdvanceUnittest(BaseUnittest):
         self.metadata.reflect(self.engine, pickletype_columns=[
             "all_type._pickle", "has_pk._pickle",
             ])
+        
         self.all_type = self.metadata.get_table("all_type")
         self.has_pk = self.metadata.get_table("has_pk")
         self.non_pk = self.metadata.get_table("non_pk")
@@ -241,7 +260,7 @@ class AdvanceUnittestNoData(BaseUnittest):
     正常工作。
     """
     def setUp(self):
-        self.connect_database(MEMORY)
+        self.connect_database(DB_FILE)
         self.create_all_type_table(has_data=False)
         self.create_has_pk_table(has_data=False)
         self.create_non_pk_table(has_data=False)
@@ -252,6 +271,7 @@ class AdvanceUnittestNoData(BaseUnittest):
         self.metadata.reflect(self.engine, pickletype_columns=[
             "all_type._pickle", "has_pk._pickle",
             ])
+        
         self.all_type = self.metadata.get_table("all_type")
         self.has_pk = self.metadata.get_table("has_pk")
         self.non_pk = self.metadata.get_table("non_pk")
@@ -261,35 +281,47 @@ class AdvanceUnittestNoData(BaseUnittest):
         remove()
 
 if __name__ == "__main__":
-#     class Unittest1(BaseUnittest):
-#         def setUp(self):
-#             self.connect_database()
-#             self.create_all_type_table(has_data=True)
-#             
-#         def test_all(self):
-#             pass
-# 
-#     class Unittest2(BaseUnittest):
-#         def setUp(self):
-#             self.connect_database()
-#             self.create_non_pk_table(has_data=True)
-#             
-#         def test_all(self):
-#             pass
-# 
-#     class Unittest3(BaseUnittest):
-#         def setUp(self):
-#             self.connect_database()
-#             self.create_has_pk_table(has_data=True)
-#             
-#         def test_all(self):
-#             pass
-#     
-#     class Unittest4(AdvanceUnittest):
-#         def test_all(self):
-#             pass
+    class Unittest1(BaseUnittest):
+        def setUp(self):
+            self.connect_database()
+            self.create_all_type_table(has_data=True)
+             
+        def test_all(self):
+            pass
+ 
+    class Unittest2(BaseUnittest):
+        def setUp(self):
+            self.connect_database()
+            self.create_non_pk_table(has_data=True)
+             
+        def test_all(self):
+            pass
+ 
+    class Unittest3(BaseUnittest):
+        def setUp(self):
+            self.connect_database()
+            self.create_has_pk_table(has_data=True)
+             
+        def test_all(self):
+            pass
+
+    class Unittest4(Sqlite3Unittest):
+        def test_all(self):
+            pass
+        
+    class Unittest4(Sqlite3UnittestHasData):
+        def test_all(self):
+            pass
+                
+    class Unittest5(Sqlite3UnittestNoData):
+        def test_all(self):
+            pass
+        
+    class Unittest6(AdvanceUnittestHasData):
+        def test_all(self):
+            pass
     
-    class Unittest5(AdvanceUnittestNoData):
+    class Unittest7(AdvanceUnittestNoData):
         def test_all(self):
             pass
         

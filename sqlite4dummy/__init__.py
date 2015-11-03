@@ -17,7 +17,7 @@ from .schema import (Column, Table, Index, MetaData,
 from .func import func
 from .sql import and_, or_, asc, desc
 
-__version__ = "0.0.5"
+__version__ = "0.0.6"
 __short_description__ = ("A high performance and easy to use sqlite API for "
                          "Data Scientist.")
 __all__ = [

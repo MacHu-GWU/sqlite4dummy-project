@@ -11,12 +11,13 @@ class, method, func, exception
 
 from __future__ import print_function, unicode_literals
 from sqlite4dummy import *
-from sqlite4dummy.tests.basetest import AdvanceUnittest, DB_FILE
+from sqlite4dummy.tests.basetest import (
+    AdvanceUnittestHasData, AdvanceUnittestNoData, DB_FILE)
 import sqlalchemy
 import time
 import unittest
 
-class SelectPerformanceUnittest(AdvanceUnittest):
+class SelectPerformanceUnittest(AdvanceUnittestHasData):
     """
      
     **中文文档**

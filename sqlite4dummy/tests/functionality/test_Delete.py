@@ -11,7 +11,7 @@ class, method, func, exception
 
 from __future__ import print_function, unicode_literals
 from sqlite4dummy import *
-from sqlite4dummy.tests.basetest import BaseUnittest, AdvanceUnittest, DB_FILE
+from sqlite4dummy.tests.basetest import *
 import unittest
 
 # class DeleteUnittest(AdvanceUnittest):

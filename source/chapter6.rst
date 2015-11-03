@@ -15,9 +15,9 @@ Example::
 
 .. code-block:: python
 
-	ins = table.insert()
-	record_list = [(value1, value2, ...) for i in range(10)]
-	engine.insdate_many_record(ins, record_list)
+    ins = table.insert()
+    record_list = [(value1, value2, ...) for i in range(10)]
+    engine.insdate_many_record(ins, record_list)
 
 
 insdate many row
@@ -27,15 +27,15 @@ Example::
 
 .. code-block:: python
 
-	ins = table.insert()
-	row_list = [
-		{
-			"#column1": value1
-			"#column2": value2
-			...
-		} for i in range(10)
-	]
-	engine.insdate_many_row(ins, row_list)
+    ins = table.insert()
+    row_list = [
+        {
+            "#column1": value1
+            "#column2": value2
+            ...
+        } for i in range(10)
+    ]
+    engine.insdate_many_row(ins, row_list)
 
 
 Next

@@ -10,5 +10,12 @@ try:
 except Exception as e:
     print(e)
 
-docfly = Docfly("sqlite4dummy", dst="source")
+docfly = Docfly(
+    "sqlite4dummy", 
+    dst="source", 
+    ignore=[
+        "sqlite4dummy.tests", 
+        "sqlite4dummy.zzz_manual_install.py",
+    ],
+)
 docfly.fly()

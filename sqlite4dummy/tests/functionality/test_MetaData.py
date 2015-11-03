@@ -10,7 +10,7 @@ class, method, func, exception
 """
 
 from sqlite4dummy import *
-from sqlite4dummy.tests.basetest import BaseUnittest, AdvanceUnittest, DB_FILE
+from sqlite4dummy.tests.basetest import *
 from datetime import datetime, date
 import unittest
 
@@ -48,15 +48,18 @@ class MetaDataUnittest(unittest.TestCase):
             Column("_date", dtype.DATE),
             Column("_datetime", dtype.DATETIME),
             Column("_pickle", dtype.PICKLETYPE),
-            )
+        )
         self.metadata.create_all(self.engine)
         
-        self.index = Index("test_index", self.metadata, self.test, True, False,
-            self.test.c._int,
-            self.test.c._float.desc(),
-            self.test.c._date,
-            desc(self.test.c._datetime),
-            )
+        self.index = Index("test_index", self.metadata,
+            [self.test.c._int,
+             self.test.c._float.desc(),
+             self.test.c._date,
+             desc(self.test.c._datetime)],
+            table_name=self.test, 
+            unique=True, 
+            skip_validate=False,
+        )
         self.index.create(self.engine)
         
         self.assertEqual(
@@ -141,6 +144,6 @@ class MetaDataUnittest(unittest.TestCase):
                          unique, True)
         self.assertEqual(second_metadata.get_index("test_index").\
                          params, self.index.params)
-
+        
 if __name__ == "__main__":
     unittest.main()
