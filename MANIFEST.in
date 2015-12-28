@@ -1,1 +1,1 @@
-include readme.rst LICENSE.txt requirements.txt
+include setup.cfg readme.rst LICENSE.txt requirements.txt
